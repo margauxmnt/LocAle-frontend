@@ -9,6 +9,7 @@ LogBox.ignoreAllLogs(true); // disable warnings
 
 import React from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
+import {NativeBaseProvider} from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 
 // Navigation
