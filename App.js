@@ -24,8 +24,9 @@ const Tab = createBottomTabNavigator();
 // Redux
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
+import beerInfo from './reducers/beerInfo.reducer';
 
-const store = createStore(combineReducers({}))
+const store = createStore(combineReducers({beerInfo}))
 
 export default function App() {
   return (
