@@ -6,6 +6,7 @@ import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
 
+
 const beerInfo = {
     id: '61ab7acc33e203ad48f9e80a',
     name: 'La Blonde',
@@ -41,9 +42,10 @@ export default function BeerInfo() {
     const [like, setLike] = useState(false);
     const [region, setRegion] = useState(currentPosition)
 
+
     useEffect(() => {
         (async () => {
-            const request = await fetch(`http://192.168.1.32:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo.id}`)
+            const request = await fetch(`http://172.16.191.142:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo.id}`)
             const result = await request.json()
             setSellers(result.sellers)
         })()
@@ -192,6 +194,7 @@ export default function BeerInfo() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#fff'
     },
     infos: {
         width: '100%',
