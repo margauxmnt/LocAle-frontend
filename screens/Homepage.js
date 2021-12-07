@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { NativeBaseProvider, ScrollView, Box, Heading, Button} from 'native-base';
+import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio} from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
 
@@ -15,6 +15,8 @@ export default function Homepage(props) {
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
     const dispatch = useDispatch();
+    //ouverture de la brasserie au clic sur celle-ci
+    const { isOpen, onOpen, onClose } = useDisclose();
 
     //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
     useEffect(() => {
@@ -24,6 +26,7 @@ export default function Homepage(props) {
             // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
             await Location.watchPositionAsync({distanceInterval: 10}, 
             (location) => { setLocation(location)});
+            dispatch({type: 'userLocalisation', location});
             }
         }askPermission();
         
@@ -43,6 +46,7 @@ export default function Homepage(props) {
     let localBreweriesMarkers = breweries.map(function (breweries, i) {
         return <Marker
             key={i}
+            onPress={onOpen}
             coordinate={{ latitude: breweries.brewerie.latitude, longitude: breweries.brewerie.longitude }}>
             <Icon name='map-marker' size={35} color={'#194454'} />
         </Marker>
@@ -50,21 +54,22 @@ export default function Homepage(props) {
 
     //création de la liste des brasseries
     let localBreweriesList = breweries.map(function (breweries, i) {
-        return <Box
-            key ={i}
-            rounded="lg"
-            borderColor="#194454"
-            height="50"
-            borderWidth="4"
-            style={styles.box}>
-            <Icon
-                name='map-marker'
-                size={30}
-                style={styles.icon} />
-            <Heading style={styles.heading}>
-                {breweries.brewerie.name}
-            </Heading>
-        </Box>
+        return <Pressable key={i} onPress={onOpen}>
+            <Box
+                rounded="lg"
+                borderColor="#194454"
+                height="50"
+                borderWidth="4"
+                style={styles.box}>
+                <Icon
+                    name='map-marker'
+                    size={30}
+                    style={styles.icon} />
+                <Heading style={styles.heading}>
+                    {breweries.brewerie.name}
+                </Heading>
+            </Box>
+        </Pressable>
     })
 
     return (
@@ -111,6 +116,45 @@ export default function Homepage(props) {
                         {localBreweriesList}
                     </ScrollView>
                 </View>
+
+                <Actionsheet isOpen={isOpen} onClose={onClose} hideDragIndicator>
+                    <Actionsheet.Content borderTopRadius="0" padding={0}>
+                        <Box w="100%" h={350} alignItems='center'>
+                            <Box flexDirection='row' w="100%">
+                                <AspectRatio w="34%" ratio={1 / 1}>
+                                    <Image
+                                        source={{ uri: "https://www.labieredesloups.fr/assets/images/portfolio/masonry/4col/8.jpg" }}
+                                        alt="image"
+                                    />
+                                </AspectRatio>
+                                <AspectRatio w="34%" ratio={1 / 1}>
+                                    <Image
+                                        source={{ uri: "https://www.labieredesloups.fr/assets/images/portfolio/masonry/4col/2.jpg" }}
+                                        alt="image"
+                                    />
+                                </AspectRatio>
+                                <AspectRatio w="34%" ratio={1 / 1}>
+                                    <Image
+                                        source={{ uri: "https://www.labieredesloups.fr/assets/images/portfolio/masonry/4col/33.jpg" }}
+                                        alt="image"
+                                    />
+                                </AspectRatio>
+                            </Box>
+                            <Text style={styles.beweriesDesc} >
+                                Des fruits, des légumes, de la bière et l'envie de passer un moment convivial fin de semaine.
+                            </Text>
+                            <Button style={styles.beerButton} size="lg">
+                                Découvrir nos bières
+                            </Button>
+                            <Text style={styles.beweriesOpening} >
+                                14h30 - 18h30
+                            </Text>
+                            <Text style={styles.beweriesAdress} >
+                                Chavagneux, 69440 Chaussan
+                            </Text>
+                        </Box>
+                    </Actionsheet.Content>
+                </Actionsheet>
 
             </View>
         </NativeBaseProvider>
@@ -178,7 +222,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         position: 'absolute',
         top: 0,
-        backgroundColor: '#8395a720',
+        backgroundColor: '#ffffff99',
         borderStyle:'solid',
         borderColor:'#8395a7',
         borderWidth: 2,
@@ -190,5 +234,32 @@ const styles = StyleSheet.create({
         // fontFamily: 'roboto',
         fontSize: 20,
         marginLeft: 15,
-    }
+    },
+    beweriesDesc: {
+        textAlign: 'center',
+        fontStyle: 'italic',
+        margin: 12,
+        color: "#194454",
+        fontSize: 14,
+        width: '70%'
+    },
+    beerButton: {
+        backgroundColor: '#FAE16C',
+        borderRadius: 50,
+    },
+    beweriesOpening: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        margin: 20,
+        color: "#194454",
+        fontSize: 15,
+        width: '70%'
+    },
+    beweriesAdress: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        color: "#8395a7",
+        fontSize: 14,
+        width: '60%'
+    },
 });
