@@ -18,7 +18,7 @@ import Homepage from './screens/Homepage';
 import Profile from './screens/Profile';
 import Wishlist from './screens/Wishlist';
 import Search from './screens/Search';
-import BeerInfo from './screens/BeerInfo';
+// import BeerInfo from './screens/BeerInfo';
 const Tab = createBottomTabNavigator();
 
 // Redux
@@ -59,7 +59,7 @@ export default function App() {
           <Tab.Screen name="Search" component={Search} />
           <Tab.Screen name="Homepage" component={Homepage} />
           <Tab.Screen name="Wishlist" component={Wishlist} />
-          <Tab.Screen name="Profile" component={BeerInfo} />
+          <Tab.Screen name="Profile" component={Profile} />
         </Tab.Navigator>
       </NavigationContainer>
     </Provider>
