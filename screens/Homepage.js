@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { NativeBaseProvider, ScrollView, Box, Heading, Button } from 'native-base';
+import { NativeBaseProvider, ScrollView, Box, Heading, Button} from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
 
@@ -43,7 +43,7 @@ export default function Homepage(props) {
     let localBreweriesMarkers = breweries.map(function (breweries, i) {
         return <Marker
             key={i}
-            coordinate={{ latitude: breweries.latitude, longitude: breweries.longitude }}>
+            coordinate={{ latitude: breweries.brewerie.latitude, longitude: breweries.brewerie.longitude }}>
             <Icon name='map-marker' size={35} color={'#194454'} />
         </Marker>
     });
@@ -62,7 +62,7 @@ export default function Homepage(props) {
                 size={30}
                 style={styles.icon} />
             <Heading style={styles.heading}>
-                {breweries.name}
+                {breweries.brewerie.name}
             </Heading>
         </Box>
     })
@@ -76,27 +76,35 @@ export default function Homepage(props) {
             </View>
 
             <View style={{ flex: 1 }}>
-                <MapView style={styles.container}
+                    
+                <MapView 
+
+                    style={styles.container}
                     region={{
                         latitude: location.coords.latitude,
                         longitude: location.coords.longitude,
                         latitudeDelta: 0.1792,
                         longitudeDelta: 0.1191,
                     }}>
-                    <Button
-                        onPress={() => props.navigation.navigate('Search')}
-                        style={styles.search}
-                        leftIcon={<Icon name="search" size={30} color={'#8395a7'}/>}
-                        size="lg"
-                        _text={styles.searchText}
-                    >Rechercher une bière...
-                    </Button>
+
                     <Marker
                         coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}>
                         <View style={styles.localisation} />
                     </Marker>
+
                     {localBreweriesMarkers}
+
                 </MapView>
+
+                <Button
+                    onPress={() => props.navigation.navigate('Search')}
+                    leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
+                    size="lg"
+                    style={styles.search}
+                    _text={styles.searchText}
+                >
+                    Rechercher une bière...
+                </Button>
 
                 <View style={styles.list}>
                     <ScrollView>
@@ -121,7 +129,7 @@ const styles = StyleSheet.create({
     headerText: {
         // fontFamily: 'roboto',
         color: '#fff',
-        fontSize: 20,
+        fontSize: 25,
         fontWeight: 'bold',
         marginTop: 35
     },
@@ -166,6 +174,7 @@ const styles = StyleSheet.create({
     },
     search: {
         flex: 1,
+        flexDirection: 'row',
         justifyContent: 'flex-start',
         position: 'absolute',
         top: 0,
@@ -180,6 +189,6 @@ const styles = StyleSheet.create({
         color: "#8395a7",
         // fontFamily: 'roboto',
         fontSize: 20,
-        marginLeft: 5,
+        marginLeft: 15,
     }
 });
