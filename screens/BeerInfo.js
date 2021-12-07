@@ -37,6 +37,7 @@ const currentPosition = {
 export default function BeerInfo() {
 
     // const beerInfo = useSelector(store => store.beerInfo)
+    // const currentPosition = useSelector(store => store.initialPosition)
 
     const [sellers, setSellers] = useState([]);
     const [like, setLike] = useState(false);

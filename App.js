@@ -14,12 +14,15 @@ import { Ionicons } from '@expo/vector-icons';
 // Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import Homepage from './screens/Homepage';
 import Profile from './screens/Profile';
 import Wishlist from './screens/Wishlist';
 import Search from './screens/Search';
-// import BeerInfo from './screens/BeerInfo';
+import BeerInfo from './screens/BeerInfo';
+import BeerList from './screens/BeerList';
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 // Redux
 import { Provider } from 'react-redux';
@@ -28,6 +31,8 @@ import beerInfo from './reducers/beerInfo.reducer';
 
 const store = createStore(combineReducers({beerInfo}))
 
+
+
 export default function App() {
   return (
     <Provider store={store}>
@@ -35,7 +40,7 @@ export default function App() {
         <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarIcon: ({ color }) => {
-              if (route.name === 'Homepage') {
+              if (route.name === 'Stack') {
                 return <Image source={require('./assets/logo_matth_transparent.png')} style={styles.logo} />;
               } else if (route.name === 'Search') {
                 return <Ionicons name="search" size={25} color={color} />;
