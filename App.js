@@ -15,9 +15,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Homepage from './screens/Homepage';
-import Profile from './screens/Profile';
 import Wishlist from './screens/Wishlist';
 import Search from './screens/Search';
+import BeerList from './screens/BeerList';
 // import BeerInfo from './screens/BeerInfo';
 const Tab = createBottomTabNavigator();
 
@@ -58,7 +58,7 @@ export default function App() {
           <Tab.Screen name="Search" component={Search} />
           <Tab.Screen name="Homepage" component={Homepage} />
           <Tab.Screen name="Wishlist" component={Wishlist} />
-          <Tab.Screen name="Profile" component={Profile} />
+          <Tab.Screen name="Profile" component={BeerList} />
         </Tab.Navigator>
       </NavigationContainer>
     </Provider>
