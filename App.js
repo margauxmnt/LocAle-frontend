@@ -8,7 +8,7 @@ import { LogBox } from "react-native";
 LogBox.ignoreAllLogs(true); // disable warnings
 
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Image } from 'react-native';
 import {NativeBaseProvider} from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -25,12 +25,14 @@ const Tab = createBottomTabNavigator();
 // Redux
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
+import breweries from './reducers/breweries.reducer';
 
-const store = createStore(combineReducers({}))
+const store = createStore(combineReducers({breweries}));
 
 export default function App() {
   return (
     <Provider store={store}>
+      <NativeBaseProvider>
       <NavigationContainer>
         <Tab.Navigator
           screenOptions={({ route }) => ({
@@ -38,23 +40,21 @@ export default function App() {
               if (route.name === 'Homepage') {
                 return <Image source={require('./assets/logo_matth_transparent.png')} style={styles.logo} />;
               } else if (route.name === 'Search') {
-                return <Ionicons name="search" size={25} color={color} />;
+                return <Ionicons name="search" size={35} color={color} />;
               } else if (route.name === 'Wishlist') {
-                return <Ionicons name="heart-outline" size={25} color={color} />;
+                return <Ionicons name="heart-outline" size={35} color={color} />;
               } else if (route.name === 'Profile') {
-                return <Ionicons name="person-outline" size={25} color={color} />;
+                return <Ionicons name="person-outline" size={35} color={color} />;
               }
             },
             headerShown: false,
+            tabBarShowLabel: false,
+            tabBarActiveTintColor: '#FAE16C',
+            tabBarInactiveTintColor: '#fff',
+            tabBarItemStyle: {
+              backgroundColor: '#194454'
+            }
           })}
-          tabBarOptions={{
-            showLabel: false,  
-            activeTintColor: '#FAE16C',
-            inactiveTintColor: '#fff',
-            tabStyle: {
-              backgroundColor: '#194454',
-            }          
-          }}
         >
           <Tab.Screen name="Search" component={Search} />
           <Tab.Screen name="Homepage" component={Homepage} />
@@ -62,6 +62,7 @@ export default function App() {
           <Tab.Screen name="Profile" component={Profile} />
         </Tab.Navigator>
       </NavigationContainer>
+      </NativeBaseProvider>
     </Provider>
   );
 }
