@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { NativeBaseProvider, ScrollView, Box, Heading, Button} from 'native-base';
+import { NativeBaseProvider, ScrollView, Box, Heading, Button } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
 
 // import des composants pour initialiser la map et la géolocalisation
-import MapView, {Marker} from 'react-native-maps'
+import MapView, { Marker } from 'react-native-maps'
 import * as Location from 'expo-location';
 
-export default function Homepage(props) {
+export default function Homepage({ navigation }) {
 
     //determine la location de l'utilisateur 
-    const [location, setLocation] = useState({coords: {latitude: 45.764043, longitude: 4.835659}});
+    const [location, setLocation] = useState({ coords: { latitude: 45.764043, longitude: 4.835659 } });
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
     const dispatch = useDispatch();
@@ -19,22 +19,22 @@ export default function Homepage(props) {
     //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
     useEffect(() => {
         async function askPermission() {
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status == 'granted') {
-            // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
-            await Location.watchPositionAsync({distanceInterval: 10}, 
-            (location) => { setLocation(location)});
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status == 'granted') {
+                // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
+                await Location.watchPositionAsync({ distanceInterval: 10 },
+                    (location) => { setLocation(location) });
             }
-        }askPermission();
-        
+        } askPermission();
+
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
-        async function searchBreweries(){
+        async function searchBreweries() {
             //attention ADRESSE IP à changer en fonction
-            let rawResponse = await fetch(`http://172.16.190.137:3000/get-breweries?position=${JSON.stringify(location)}`);
+            let rawResponse = await fetch(`http://172.16.191.142:3000/get-breweries?position=${JSON.stringify(location)}`);
             var response = await rawResponse.json();
-            if (response){
+            if (response) {
                 setBreweries(response.breweries);
-                dispatch({type: 'addLocalBreweries', newBreweries : response.breweries});
+                dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
             };
         }; searchBreweries();
     }, []);
@@ -51,12 +51,13 @@ export default function Homepage(props) {
     //création de la liste des brasseries
     let localBreweriesList = breweries.map(function (breweries, i) {
         return <Box
-            key ={i}
+            key={i}
             rounded="lg"
             borderColor="#194454"
             height="50"
             borderWidth="4"
-            style={styles.box}>
+            style={styles.box}
+            >
             <Icon
                 name='map-marker'
                 size={30}
@@ -76,9 +77,9 @@ export default function Homepage(props) {
             </View>
 
             <View style={{ flex: 1 }}>
-                    
-                <MapView 
 
+                <MapView
+                    onPress={() => navigation.navigate('BeerList')}
                     style={styles.container}
                     region={{
                         latitude: location.coords.latitude,
@@ -97,7 +98,7 @@ export default function Homepage(props) {
                 </MapView>
 
                 <Button
-                    onPress={() => props.navigation.navigate('Search')}
+                    onPress={() => navigation.navigate('Search')}
                     leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
                     size="lg"
                     style={styles.search}
@@ -151,10 +152,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#194454',
         height: '20%'
     },
-    box : {
-        flex: 1, 
+    box: {
+        flex: 1,
         flexDirection: 'row',
-        alignItems: 'center', 
+        alignItems: 'center',
         justifyContent: 'flex-start',
         backgroundColor: 'white',
         borderColor: "#194454",
@@ -179,8 +180,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         backgroundColor: '#8395a720',
-        borderStyle:'solid',
-        borderColor:'#8395a7',
+        borderStyle: 'solid',
+        borderColor: '#8395a7',
         borderWidth: 2,
         width: '100%',
         color: '#8395a7'

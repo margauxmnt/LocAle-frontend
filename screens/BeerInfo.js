@@ -7,36 +7,36 @@ import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
 
 
-const beerInfo = {
-    id: '61ab7acc33e203ad48f9e80a',
-    name: 'La Blonde',
-    slogan: 'Blonde douce et typée aux arômes légèrement herbacées et torréfiées.',
-    alcool: 5.3,
-    type: "Blonde",
-    notes: [
-        {
-            note: 4,
-            comment: 'Très bonne découverte !',
-            date: '18/10/2021',
-            owner: 'juju25'
-        },
-        {
-            note: 3,
-            comment: 'Très bonne blonde',
-            date: '17/02/2021',
-            owner: 'matetlot'
-        },
-    ],
-    picture: 'https://www.labieredesloups.fr/assets/images/team/grid/1.png'
-}
+// const beerInfo = {
+//     id: '61ab7acc33e203ad48f9e80a',
+//     name: 'La Blonde',
+//     slogan: 'Blonde douce et typée aux arômes légèrement herbacées et torréfiées.',
+//     alcool: 5.3,
+//     type: "Blonde",
+//     notes: [
+//         {
+//             note: 4,
+//             comment: 'Très bonne découverte !',
+//             date: '18/10/2021',
+//             owner: 'juju25'
+//         },
+//         {
+//             note: 3,
+//             comment: 'Très bonne blonde',
+//             date: '17/02/2021',
+//             owner: 'matetlot'
+//         },
+//     ],
+//     picture: 'https://www.labieredesloups.fr/assets/images/team/grid/1.png'
+// }
 const currentPosition = {
     latitude: 45.763420,
     longitude: 4.834277,
 }
 
-export default function BeerInfo() {
+export default function BeerInfo({navigation}) {
 
-    // const beerInfo = useSelector(store => store.beerInfo)
+    const beerInfo = useSelector(store => store.beerInfo)
     // const currentPosition = useSelector(store => store.initialPosition)
 
     const [sellers, setSellers] = useState([]);
@@ -56,13 +56,13 @@ export default function BeerInfo() {
     // --- note globale --- //
     let stars = [];
     let globalNote = 0;
-    beerInfo.notes.forEach(el => globalNote += el.note);
-    globalNote = Math.floor(globalNote / beerInfo.notes.length);
-    for (let i = 0; i < 5; i++) {
-        if (globalNote > i) {
-            stars.push(<Icon style={styles.star} name="star" size={30} color="#FAE16C" />)
-        } else stars.push(<Icon style={styles.star} name="star" size={30} color="#FEF5CB" />)
-    }
+    // beerInfo.notes.forEach(el => globalNote += el.note);
+    // globalNote = Math.floor(globalNote / beerInfo.notes.length);
+    // for (let i = 0; i < 5; i++) {
+    //     if (globalNote > i) {
+    //         stars.push(<Icon style={styles.star} name="star" size={30} color="#FAE16C" />)
+    //     } else stars.push(<Icon style={styles.star} name="star" size={30} color="#FEF5CB" />)
+    // }
 
 
     // --- marqueurs des revendeurs --- //
@@ -93,7 +93,7 @@ export default function BeerInfo() {
     return (
         <View style={styles.container} >
             <View style={styles.topBar} >
-                <Icon style={styles.icon} name="chevron-left" size={30} color="#fff" />
+                <Icon onPress={() => navigation.navigate('BeerList')} style={styles.icon} name="chevron-left" size={30} color="#fff" />
                 <Text style={styles.text}>{beerInfo.name}</Text>
             </View>
             <ScrollView nestedScrollEnabled={true} >
@@ -118,7 +118,7 @@ export default function BeerInfo() {
                         <View style={{ alignItems: 'center', marginTop: 30 }}>
                             <Text style={styles.avis}>L'avis des buveurs</Text>
                             <View style={styles.starContainer}>
-                                {stars}
+                                {/* {stars} */}
                                 <Text>({beerInfo.notes.length})</Text>
                             </View>
                         </View>
@@ -156,7 +156,7 @@ export default function BeerInfo() {
                 <View style={styles.notes}>
                     <Text style={styles.addnote}><Icon name="plus" size={30} color="lightgrey" />   Laisser mon avis ...</Text>
 
-                    {beerInfo.notes.map((el, i) => (
+                    {/* {beerInfo.notes.map((el, i) => (
                         <View style={styles.card}>
                             <View style={styles.starContainer}>
                                 {starByNote(() => {
@@ -182,7 +182,7 @@ export default function BeerInfo() {
                                 <Text style={{ fontSize: 18, width: 180 }}>{el.comment}</Text>
                             </View>
                         </View>
-                    ))}
+                    ))} */}
 
 
 
