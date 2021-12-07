@@ -19,15 +19,17 @@ import Homepage from './screens/Homepage';
 import Profile from './screens/Profile';
 import Wishlist from './screens/Wishlist';
 import Search from './screens/Search';
-// import BeerInfo from './screens/BeerInfo';
+import BeerInfo from './screens/BeerInfo';
 const Tab = createBottomTabNavigator();
 
 // Redux
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
+import beerInfo from './reducers/beerInfo.reducer';
 
-const store = createStore(combineReducers({breweries}));
+const store = createStore(combineReducers({breweries, beerInfo}));
+
 
 export default function App() {
   return (
@@ -59,7 +61,7 @@ export default function App() {
           <Tab.Screen name="Search" component={Search} />
           <Tab.Screen name="Homepage" component={Homepage} />
           <Tab.Screen name="Wishlist" component={Wishlist} />
-          <Tab.Screen name="Profile" component={Profile} />
+          <Tab.Screen name="Profile" component={BeerInfo} />
         </Tab.Navigator>
       </NavigationContainer>
       </NativeBaseProvider>
