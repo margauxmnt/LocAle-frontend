@@ -28,8 +28,10 @@ import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
 import beerInfo from './reducers/beerInfo.reducer';
-const store = createStore(combineReducers({ breweries, beerInfo }));
+import location from './reducers/location.reducer';
+import selectedBrewerie from "./reducers/selectedBrewerie.reducer";
 
+const store = createStore(combineReducers({breweries, beerInfo, location, selectedBrewerie}));
 
 const HomeStack = createNativeStackNavigator();
 
@@ -69,14 +71,16 @@ export default function App() {
               tabBarActiveTintColor: '#FAE16C',
               tabBarInactiveTintColor: '#fff',
               tabBarItemStyle: {
-                backgroundColor: '#194454',
-                height: 50,
+                backgroundColor: '#194454'
+              },
+              tabBarStyle : {
+                backgroundColor: '#194454'
               }
             })}
           >
             <Tab.Screen name="Homepage" component={StackNavigator} />
-            <Tab.Screen name="Wishlist" component={Wishlist} />
             <Tab.Screen name="Search" component={Search} />
+            <Tab.Screen name="Wishlist" component={Wishlist} />
             <Tab.Screen name="Profile" component={Profile} />
           </Tab.Navigator>
         </NavigationContainer>
