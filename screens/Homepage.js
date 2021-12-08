@@ -12,6 +12,13 @@ export default function Homepage({ navigation }) {
 
     //determine la location de l'utilisateur 
     const [location, setLocation] = useState({ coords: { latitude: 45.764043, longitude: 4.835659 } });
+    //localisation de la map
+    const [region, setRegion] = useState({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.1792,
+            longitudeDelta: 0.1191,
+        });
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
     const dispatch = useDispatch();
@@ -69,6 +76,12 @@ export default function Homepage({ navigation }) {
         onOpen();
         let date = new Date();
         setOpeningHours(brewerie.hours[date.getDay()].openings);
+        setRegion({
+            latitude: brewerie.latitude,
+            longitude: brewerie.longitude,
+            latitudeDelta: 0.0492,
+            longitudeDelta: 0.0291,
+        })
     };
 
     // création des marqueurs des brasseries autour de l'utilisateur
@@ -114,12 +127,7 @@ export default function Homepage({ navigation }) {
             <MapView
                     provider={MapView.PROVIDER_GOOGLE}
                     style={styles.container}
-                    region={{
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.longitude,
-                        latitudeDelta: 0.1792,
-                        longitudeDelta: 0.1191,
-                    }}>
+                    region={region}>
 
                     <Marker
                         coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}>
@@ -147,7 +155,17 @@ export default function Homepage({ navigation }) {
                     </ScrollView>
                 </View>
 
-                <Actionsheet isOpen={isOpen} onClose={onClose} hideDragIndicator>
+                <Actionsheet 
+                    isOpen={isOpen} 
+                    onClose={() => {
+                        onClose();
+                        setRegion({
+                            latitude: location.coords.latitude,
+                            longitude: location.coords.longitude,
+                            latitudeDelta: 0.1792,
+                            longitudeDelta: 0.1191,
+                        })} }
+                    hideDragIndicator>
                     <Actionsheet.Content borderTopRadius="0" padding={0}>
                         <Box w="100%" h={350} alignItems='center'>
                             <Box flexDirection='row' w="100%">
