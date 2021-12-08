@@ -158,9 +158,10 @@ export default function Homepage({ navigation }) {
                                 {selectedBrewerie.description}
                             </Text>
                             <Button 
-                                onPress={() => 
-                                    dispatch({type: 'selectedBrewerie', Id : selectedBrewerie._id}), 
-                                    props.navigation.navigate('BeerInfo')}
+                                onPress={() => {
+                                    dispatch({type: 'selectedBrewerie', Id : selectedBrewerie._id}); 
+                                    navigation.navigate('BeerList')
+                                }}
                                 style={styles.beerButton} 
                                 size="lg">
                                 Découvrir nos bières
