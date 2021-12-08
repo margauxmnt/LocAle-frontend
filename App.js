@@ -30,8 +30,9 @@ import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
 import beerInfo from './reducers/beerInfo.reducer';
 import location from './reducers/location.reducer';
+import selectedBrewerie from "./reducers/selectedBrewerie.reducer";
 
-const store = createStore(combineReducers({breweries, beerInfo, location}));
+const store = createStore(combineReducers({breweries, beerInfo, location, selectedBrewerie}));
 
 export default function App() {
   return (

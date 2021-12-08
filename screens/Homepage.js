@@ -85,6 +85,7 @@ export default function Homepage(props) {
         </Pressable>
     });
 
+    console.log(selectedBrewerie._id);
 
     return (
         // initialisation de la map et marqueur géolocalisé de l'utilisateur
@@ -120,6 +121,7 @@ export default function Homepage(props) {
                     leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
                     size="lg"
                     style={styles.search}
+                    display={isOpen ? "none" : null}
                     _text={styles.searchText}
                 >
                     Rechercher une bière...
@@ -157,7 +159,12 @@ export default function Homepage(props) {
                             <Text style={styles.beweriesDesc} >
                                 {selectedBrewerie.description}
                             </Text>
-                            <Button style={styles.beerButton} size="lg">
+                            <Button 
+                                onPress={() => 
+                                    dispatch({type: 'selectedBrewerie', Id : selectedBrewerie._id}), 
+                                    props.navigation.navigate('BeerInfo')}
+                                style={styles.beerButton} 
+                                size="lg">
                                 Découvrir nos bières
                             </Button>
                             <Text style={styles.beweriesOpening} >
