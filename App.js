@@ -3,36 +3,62 @@
  * MVP - La Capsule academy
  * 
  */
-
+import 'react-native-gesture-handler';
 import { LogBox } from "react-native";
 LogBox.ignoreAllLogs(true); // disable warnings
 
 import React from 'react';
 import { StyleSheet, Image } from 'react-native';
-import {NativeBaseProvider} from 'native-base';
+import { NativeBaseProvider } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 
 // Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Homepage from './screens/Homepage';
-import Profile from './screens/Profile';
 import Wishlist from './screens/Wishlist';
 import Search from './screens/Search';
+<<<<<<< HEAD
 // import BeerInfo from './screens/BeerInfo';
 
 const Tab = createBottomTabNavigator();
+=======
+import Profile from './screens/Profile';
+import BeerList from './screens/BeerList';
+import BeerInfo from './screens/BeerInfo';
+>>>>>>> efe0de93ca6974f23dcfdd2293f741cede83cdaa
 
 // Redux
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
 import beerInfo from './reducers/beerInfo.reducer';
+<<<<<<< HEAD
 import location from './reducers/location.reducer';
 import selectedBrewerie from "./reducers/selectedBrewerie.reducer";
 
 const store = createStore(combineReducers({breweries, beerInfo, location, selectedBrewerie}));
+=======
+const store = createStore(combineReducers({ breweries, beerInfo }));
+
+
+const HomeStack = createNativeStackNavigator();
+
+const StackNavigator = () => {
+  return (
+    <HomeStack.Navigator screenOptions={{headerShown: false}}>
+      <HomeStack.Screen name="Homepage" component={Homepage} />
+      <HomeStack.Screen name="BeerList" component={BeerList} />
+      <HomeStack.Screen name="BeerInfo" component={BeerInfo} />
+    </HomeStack.Navigator>
+  )
+}
+
+
+const Tab = createBottomTabNavigator();
+>>>>>>> efe0de93ca6974f23dcfdd2293f741cede83cdaa
 
 export default function App() {
   return (
@@ -57,15 +83,24 @@ export default function App() {
               tabBarActiveTintColor: '#FAE16C',
               tabBarInactiveTintColor: '#fff',
               tabBarItemStyle: {
+<<<<<<< HEAD
                 backgroundColor: '#194454'
               },
               tabBarStyle : {
                 backgroundColor: '#194454'
+=======
+                backgroundColor: '#194454',
+                height: 50,
+>>>>>>> efe0de93ca6974f23dcfdd2293f741cede83cdaa
               }
             })}
           >
             <Tab.Screen name="Search" component={Search} />
+<<<<<<< HEAD
             <Tab.Screen name="Homepage" component={Homepage} />
+=======
+            <Tab.Screen name="Homepage" component={StackNavigator} />
+>>>>>>> efe0de93ca6974f23dcfdd2293f741cede83cdaa
             <Tab.Screen name="Wishlist" component={Wishlist} />
             <Tab.Screen name="Profile" component={Profile} />
           </Tab.Navigator>

@@ -5,13 +5,13 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
 
 // import des composants pour initialiser la map et la géolocalisation
-import MapView, {Marker} from 'react-native-maps'
+import MapView, { Marker } from 'react-native-maps'
 import * as Location from 'expo-location';
 
-export default function Homepage(props) {
+export default function Homepage({ navigation }) {
 
     //determine la location de l'utilisateur 
-    const [location, setLocation] = useState({coords: {latitude: 45.764043, longitude: 4.835659}});
+    const [location, setLocation] = useState({ coords: { latitude: 45.764043, longitude: 4.835659 } });
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
     const dispatch = useDispatch();
@@ -32,16 +32,16 @@ export default function Homepage(props) {
             (location) => { setLocation(location)});
             dispatch({type: 'userLocalisation', location});
             }
-        }askPermission();
-        
+        } askPermission();
+
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
-        async function searchBreweries(){
+        async function searchBreweries() {
             //attention ADRESSE IP à changer en fonction
             let rawResponse = await fetch(`http://172.16.190.146:3000/get-breweries?position=${JSON.stringify(location)}`);
             var response = await rawResponse.json();
-            if (response){
+            if (response) {
                 setBreweries(response.breweries);
-                dispatch({type: 'addLocalBreweries', newBreweries : response.breweries});
+                dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
             };
         }; searchBreweries();
     }, []);
@@ -94,9 +94,8 @@ export default function Homepage(props) {
             </View>
 
             <View style={{ flex: 1 }}>
-                    
-                <MapView 
 
+            <MapView
                     provider={MapView.PROVIDER_GOOGLE}
                     style={styles.container}
                     region={{
@@ -116,7 +115,7 @@ export default function Homepage(props) {
                 </MapView>
 
                 <Button
-                    onPress={() => props.navigation.navigate('Search')}
+                    onPress={() => navigation.navigate('Search')}
                     leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
                     size="lg"
                     style={styles.search}
@@ -215,10 +214,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#194454',
         height: '20%'
     },
-    box : {
-        flex: 1, 
+    box: {
+        flex: 1,
         flexDirection: 'row',
-        alignItems: 'center', 
+        alignItems: 'center',
         justifyContent: 'flex-start',
         backgroundColor: 'white',
         borderColor: "#194454",
