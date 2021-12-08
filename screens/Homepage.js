@@ -15,8 +15,12 @@ export default function Homepage(props) {
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
     const dispatch = useDispatch();
+    //brasserie sélectionnée
+    const [selectedBrewerie, setSelectedBrewerie] = useState({});
     //ouverture de la brasserie au clic sur celle-ci
     const { isOpen, onOpen, onClose } = useDisclose();
+    //horaire d'ouverture de la brasserie en fonction du jour
+    const [openingHours, setOpeningHours] = useState("");
 
     //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
     useEffect(() => {
@@ -33,7 +37,7 @@ export default function Homepage(props) {
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries(){
             //attention ADRESSE IP à changer en fonction
-            let rawResponse = await fetch(`http://172.16.190.137:3000/get-breweries?position=${JSON.stringify(location)}`);
+            let rawResponse = await fetch(`http://172.16.190.146:3000/get-breweries?position=${JSON.stringify(location)}`);
             var response = await rawResponse.json();
             if (response){
                 setBreweries(response.breweries);
@@ -42,11 +46,20 @@ export default function Homepage(props) {
         }; searchBreweries();
     }, []);
 
+    //enregistrement de la brasserie sélectionnée et ouverture de la pop up avec les infos de celle ci
+    //récupération du jour pour afficher les horaires du jour de la brasserie sélectionnée
+    let selectBrewerie = (brewerie) => {
+        setSelectedBrewerie(brewerie);
+        onOpen();
+        let date=new Date();
+        setOpeningHours(brewerie.hours[date.getDay()].openings);
+    };
+
     // création des marqueurs des brasseries autour de l'utilisateur
     let localBreweriesMarkers = breweries.map(function (breweries, i) {
         return <Marker
             key={i}
-            onPress={onOpen}
+            onPress={()=> selectBrewerie(breweries.brewerie)}
             coordinate={{ latitude: breweries.brewerie.latitude, longitude: breweries.brewerie.longitude }}>
             <Icon name='map-marker' size={35} color={'#194454'} />
         </Marker>
@@ -54,7 +67,7 @@ export default function Homepage(props) {
 
     //création de la liste des brasseries
     let localBreweriesList = breweries.map(function (breweries, i) {
-        return <Pressable key={i} onPress={onOpen}>
+        return <Pressable key={i} onPress={()=> selectBrewerie(breweries.brewerie)}>
             <Box
                 rounded="lg"
                 borderColor="#194454"
@@ -70,14 +83,15 @@ export default function Homepage(props) {
                 </Heading>
             </Box>
         </Pressable>
-    })
+    });
+
 
     return (
         // initialisation de la map et marqueur géolocalisé de l'utilisateur
         <NativeBaseProvider>
 
             <View style={styles.header}>
-                <Text style={styles.headerText}>Loc'Ale</Text>
+                <Text style={styles.headerText}>{isOpen ? selectedBrewerie.name : "Loc'Ale"}</Text>
             </View>
 
             <View style={{ flex: 1 }}>
@@ -123,34 +137,34 @@ export default function Homepage(props) {
                             <Box flexDirection='row' w="100%">
                                 <AspectRatio w="34%" ratio={1 / 1}>
                                     <Image
-                                        source={{ uri: "https://www.labieredesloups.fr/assets/images/portfolio/masonry/4col/8.jpg" }}
+                                        source={isOpen ? { uri: selectedBrewerie.pictures[0] } : null}
                                         alt="image"
                                     />
                                 </AspectRatio>
                                 <AspectRatio w="34%" ratio={1 / 1}>
                                     <Image
-                                        source={{ uri: "https://www.labieredesloups.fr/assets/images/portfolio/masonry/4col/2.jpg" }}
+                                        source={isOpen ? { uri: selectedBrewerie.pictures[1] } : null}
                                         alt="image"
                                     />
                                 </AspectRatio>
                                 <AspectRatio w="34%" ratio={1 / 1}>
                                     <Image
-                                        source={{ uri: "https://www.labieredesloups.fr/assets/images/portfolio/masonry/4col/33.jpg" }}
+                                        source={isOpen ? { uri: selectedBrewerie.pictures[2] } : null}
                                         alt="image"
                                     />
                                 </AspectRatio>
                             </Box>
                             <Text style={styles.beweriesDesc} >
-                                Des fruits, des légumes, de la bière et l'envie de passer un moment convivial fin de semaine.
+                                {selectedBrewerie.description}
                             </Text>
                             <Button style={styles.beerButton} size="lg">
                                 Découvrir nos bières
                             </Button>
                             <Text style={styles.beweriesOpening} >
-                                14h30 - 18h30
+                                {openingHours}
                             </Text>
                             <Text style={styles.beweriesAdress} >
-                                Chavagneux, 69440 Chaussan
+                                {selectedBrewerie.adress}
                             </Text>
                         </Box>
                     </Actionsheet.Content>
@@ -241,7 +255,7 @@ const styles = StyleSheet.create({
         margin: 12,
         color: "#194454",
         fontSize: 14,
-        width: '70%'
+        width: '90%'
     },
     beerButton: {
         backgroundColor: '#FAE16C',
@@ -250,7 +264,7 @@ const styles = StyleSheet.create({
     beweriesOpening: {
         textAlign: 'center',
         fontWeight: 'bold',
-        margin: 20,
+        margin: 15,
         color: "#194454",
         fontSize: 15,
         width: '70%'
