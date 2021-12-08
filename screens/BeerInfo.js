@@ -45,24 +45,25 @@ export default function BeerInfo({navigation}) {
 
 
     useEffect(() => {
-        (async () => {
-            const request = await fetch(`http://172.16.191.142:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo.id}`)
+        const getSellers = async () => {
+            const request = await fetch(`http://172.16.191.137:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
             const result = await request.json()
             setSellers(result.sellers)
-        })()
-    }, [])
+        }
+        getSellers();
+    }, [beerInfo])
 
 
     // --- note globale --- //
     let stars = [];
     let globalNote = 0;
-    // beerInfo.notes.forEach(el => globalNote += el.note);
-    // globalNote = Math.floor(globalNote / beerInfo.notes.length);
-    // for (let i = 0; i < 5; i++) {
-    //     if (globalNote > i) {
-    //         stars.push(<Icon style={styles.star} name="star" size={30} color="#FAE16C" />)
-    //     } else stars.push(<Icon style={styles.star} name="star" size={30} color="#FEF5CB" />)
-    // }
+    beerInfo.notes.forEach(el => globalNote += el.note);
+    globalNote = Math.floor(globalNote / beerInfo.notes.length);
+    for (let i = 0; i < 5; i++) {
+        if (globalNote > i) {
+            stars.push(<Icon style={styles.star} name="star" size={30} color="#FAE16C" />)
+        } else stars.push(<Icon style={styles.star} name="star" size={30} color="#FEF5CB" />)
+    }
 
 
     // --- marqueurs des revendeurs --- //
@@ -118,7 +119,7 @@ export default function BeerInfo({navigation}) {
                         <View style={{ alignItems: 'center', marginTop: 30 }}>
                             <Text style={styles.avis}>L'avis des buveurs</Text>
                             <View style={styles.starContainer}>
-                                {/* {stars} */}
+                                {stars}
                                 <Text>({beerInfo.notes.length})</Text>
                             </View>
                         </View>
@@ -156,7 +157,7 @@ export default function BeerInfo({navigation}) {
                 <View style={styles.notes}>
                     <Text style={styles.addnote}><Icon name="plus" size={30} color="lightgrey" />   Laisser mon avis ...</Text>
 
-                    {/* {beerInfo.notes.map((el, i) => (
+                    {beerInfo.notes.map((el, i) => (
                         <View style={styles.card}>
                             <View style={styles.starContainer}>
                                 {starByNote(() => {
@@ -175,14 +176,14 @@ export default function BeerInfo({navigation}) {
                                         <View style={{ margin: 10, backgroundColor: 'grey', width: 30, height: 30, borderRadius: 50, alignItems: 'center', justifyContent: 'center' }}>
                                             <Icon name="user" size={20} color="#fff" />
                                         </View>
-                                        <Text>{el.owner}</Text>
+                                        <Text style={{width: 100}}>{el.owner.pseudo}</Text>
                                     </View>
-                                    <Text style={{ fontSize: 11 }}>{el.date}</Text>
+                                    <Text style={{ fontSize: 11 }}>date</Text>
                                 </View>
                                 <Text style={{ fontSize: 18, width: 180 }}>{el.comment}</Text>
                             </View>
                         </View>
-                    ))} */}
+                    ))}
 
 
 

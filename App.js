@@ -74,9 +74,9 @@ export default function App() {
               }
             })}
           >
-            <Tab.Screen name="Search" component={Search} />
             <Tab.Screen name="Homepage" component={StackNavigator} />
             <Tab.Screen name="Wishlist" component={Wishlist} />
+            <Tab.Screen name="Search" component={Search} />
             <Tab.Screen name="Profile" component={Profile} />
           </Tab.Navigator>
         </NavigationContainer>

@@ -11,7 +11,7 @@ import IconI from 'react-native-vector-icons/AntDesign';
 import { useDispatch } from 'react-redux';
 
 
-export default function BeerList({navigation}) {
+export default function BeerList({ navigation }) {
 
     const [beers, setBeers] = useState([]);
     const dispatch = useDispatch();
@@ -19,15 +19,15 @@ export default function BeerList({navigation}) {
 
     useEffect(() => {
         async function loadData() {
-            let request = await fetch(`http://172.16.191.142:3000/get-beers/${breweryName}`)
+            let request = await fetch(`http://172.16.191.137:3000/get-beers/${breweryName}`)
             let result = await request.json()
-            setBeers(result.beers)
+            setBeers(result)
         }
         loadData()
     }, [])
 
     const moreInfoBeer = (beer) => {
-        dispatch({type: 'updateBeer', beerInfo: beer})
+        dispatch({ type: 'updateBeer', beerInfo: beer })
         navigation.navigate('BeerInfo')
     }
 
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     containerChildTwo: {
         height: 150,
         justifyContent: 'space-between',
+        width: 150,
     },
     texte: {
         color: '#194454',

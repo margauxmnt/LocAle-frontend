@@ -30,13 +30,14 @@ export default function Homepage({ navigation }) {
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries() {
             //attention ADRESSE IP à changer en fonction
-            let rawResponse = await fetch(`http://172.16.191.142:3000/get-breweries?position=${JSON.stringify(location)}`);
+            let rawResponse = await fetch(`http://172.16.191.137:3000/get-breweries?position=${JSON.stringify(location)}`);
             var response = await rawResponse.json();
             if (response) {
                 setBreweries(response.breweries);
                 dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
             };
-        }; searchBreweries();
+        }; 
+        searchBreweries();
     }, []);
 
     // création des marqueurs des brasseries autour de l'utilisateur
@@ -59,6 +60,7 @@ export default function Homepage({ navigation }) {
             style={styles.box}
             >
             <Icon
+            
                 name='map-marker'
                 size={30}
                 style={styles.icon} />
