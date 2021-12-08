@@ -17,9 +17,9 @@ export default function Homepage(props) {
     const dispatch = useDispatch();
     //brasserie sélectionnée
     const [selectedBrewerie, setSelectedBrewerie] = useState({});
-    //ouverture de la brasserie au clic sur celle-ci
+    //ouverture des infos brasserie au clic sur celle-ci
     const { isOpen, onOpen, onClose } = useDisclose();
-    //horaire d'ouverture de la brasserie en fonction du jour
+    //horaires d'ouverture de la brasserie en fonction du jour
     const [openingHours, setOpeningHours] = useState("");
 
     //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
@@ -85,8 +85,6 @@ export default function Homepage(props) {
         </Pressable>
     });
 
-    console.log(selectedBrewerie._id);
-
     return (
         // initialisation de la map et marqueur géolocalisé de l'utilisateur
         <NativeBaseProvider>
@@ -99,6 +97,7 @@ export default function Homepage(props) {
                     
                 <MapView 
 
+                    provider={MapView.PROVIDER_GOOGLE}
                     style={styles.container}
                     region={{
                         latitude: location.coords.latitude,

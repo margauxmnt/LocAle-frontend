@@ -58,6 +58,9 @@ export default function App() {
               tabBarInactiveTintColor: '#fff',
               tabBarItemStyle: {
                 backgroundColor: '#194454'
+              },
+              tabBarStyle : {
+                backgroundColor: '#194454'
               }
             })}
           >
