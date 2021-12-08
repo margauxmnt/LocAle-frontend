@@ -158,7 +158,7 @@ export default function BeerInfo({navigation}) {
                     <Text style={styles.addnote}><Icon name="plus" size={30} color="lightgrey" />   Laisser mon avis ...</Text>
 
                     {beerInfo.notes.map((el, i) => (
-                        <View style={styles.card}>
+                        <View key={i} style={styles.card}>
                             <View style={styles.starContainer}>
                                 {starByNote(() => {
                                     let stars = [];

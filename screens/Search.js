@@ -39,7 +39,11 @@ function TypeaheadUsingComponentWithRenderItem(props) {
             })()
             props.navigation.navigate('Homepage', { screen: 'BeerInfo' })
         } else {
-            dispatch({ type: 'selectedBrewery', brewery: data[item] })
+            (async () => {
+                const request = await fetch(`http://172.16.191.137:3000/get-brewery/${data[item].id}`);
+                const result = await request.json()
+                dispatch({ type: 'selectedBrewerie', brewery: result })
+            })()
             props.navigation.navigate('Homepage')
         }
     }

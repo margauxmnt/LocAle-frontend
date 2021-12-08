@@ -8,18 +8,18 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconI from 'react-native-vector-icons/AntDesign';
 // redux
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 export default function BeerList({ navigation }) {
 
     const [beers, setBeers] = useState([]);
     const dispatch = useDispatch();
-    const breweryName = 'Demi-Lune';
+    const selectedBrewerie = useSelector(store => store.selectedBrewerie)
 
     useEffect(() => {
         async function loadData() {
-            let request = await fetch(`http://172.16.191.137:3000/get-beers/${breweryName}`)
+            let request = await fetch(`http://172.16.191.137:3000/get-beers/${selectedBrewerie._id}`)
             let result = await request.json()
             setBeers(result)
         }
@@ -34,13 +34,21 @@ export default function BeerList({ navigation }) {
     return (
         <View style={{ backgroundColor: '#194454', flex: 1 }}>
             <View style={styles.topBar} >
-                <Icon onPress={() => navigation.navigate('Homepage')} style={styles.icon} name="chevron-left" size={30} color="#fff" />
-                <Text style={styles.text}>Beer Name</Text>
+                <Icon onPress={() => {
+                    dispatch({ type: 'selectedBrewerie', brewery: '' })
+                    navigation.navigate('Homepage');
+                }}
+                    style={styles.icon}
+                    name="chevron-left"
+                    size={30}
+                    color="#fff"
+                />
+                <Text style={styles.text}>{selectedBrewerie.name}</Text>
             </View>
 
             <ScrollView>
-                {beers.map(el => (
-                    <View style={styles.containerParent} >
+                {beers.map((el, i) => (
+                    <View key={i} style={styles.containerParent} >
 
                         <View>
                             <Image style={styles.image} source={{ uri: el.picture }}></Image>
