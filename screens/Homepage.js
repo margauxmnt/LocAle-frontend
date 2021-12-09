@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio} from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 // import des composants pour initialiser la map et la géolocalisation
 import MapView, { Marker } from 'react-native-maps'
@@ -29,6 +29,9 @@ export default function Homepage({ navigation }) {
     //horaires d'ouverture de la brasserie en fonction du jour
     const [openingHours, setOpeningHours] = useState("");
 
+    // si une brasserie est sélectionnée, on affiche le modal et on setSelectedBrewerie
+    const selectedBrewerieRedux = useSelector(store => store.selectedBrewerie)
+
     //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
     useEffect(() => {
         async function askPermission() {
@@ -50,15 +53,28 @@ export default function Homepage({ navigation }) {
                 setBreweries(response.breweries);
                 dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
             };
-        }; searchBreweries();
+        }; 
+        searchBreweries();
     }, []);
+
+
+    // quand on redirige d'une page vers la homepage, si il y a une brasserie à afficher on ouvre la modale avec la brasserie
+    // et si il n'y a rien dans le store, on ferme la modale et on ne met aucune infos sélectionée
+    useEffect(() => {
+        if(selectedBrewerieRedux.length !== 0){
+            selectBrewerie(selectedBrewerieRedux)
+        }else {
+            setSelectedBrewerie({})
+            onClose();
+        }
+    }, [selectedBrewerieRedux])
 
     //enregistrement de la brasserie sélectionnée et ouverture de la pop up avec les infos de celle ci
     //récupération du jour pour afficher les horaires du jour de la brasserie sélectionnée
     let selectBrewerie = (brewerie) => {
         setSelectedBrewerie(brewerie);
         onOpen();
-        let date=new Date();
+        let date = new Date();
         setOpeningHours(brewerie.hours[date.getDay()].openings);
         setRegion({
             latitude: brewerie.latitude,
@@ -177,7 +193,7 @@ export default function Homepage({ navigation }) {
                             </Text>
                             <Button 
                                 onPress={() => {
-                                    dispatch({type: 'selectedBrewerie', Id : selectedBrewerie._id}); 
+                                    dispatch({type: 'selectedBrewerie', brewery: selectedBrewerie}); 
                                     navigation.navigate('BeerList')
                                 }}
                                 style={styles.beerButton} 
