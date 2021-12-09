@@ -3,6 +3,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio} from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 
 // import des composants pour initialiser la map et la géolocalisation
 import MapView, { Marker } from 'react-native-maps'
@@ -28,7 +29,8 @@ export default function Homepage({ navigation }) {
     const { isOpen, onOpen, onClose } = useDisclose();
     //horaires d'ouverture de la brasserie en fonction du jour
     const [openingHours, setOpeningHours] = useState("");
-
+    // pour savoir si on se trouve sur la page ou non
+    const isFocused = useIsFocused();
     // si une brasserie est sélectionnée, on affiche le modal et on setSelectedBrewerie
     const selectedBrewerieRedux = useSelector(store => store.selectedBrewerie)
 
@@ -61,7 +63,7 @@ export default function Homepage({ navigation }) {
     // quand on redirige d'une page vers la homepage, si il y a une brasserie à afficher on ouvre la modale avec la brasserie
     // et si il n'y a rien dans le store, on ferme la modale et on ne met aucune infos sélectionée
     useEffect(() => {
-        if(selectedBrewerieRedux.length !== 0){
+        if(selectedBrewerieRedux.length !== 0 && isFocused){
             selectBrewerie(selectedBrewerieRedux)
         }else {
             setSelectedBrewerie({})
