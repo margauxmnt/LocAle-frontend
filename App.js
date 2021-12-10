@@ -14,11 +14,14 @@ import { NativeBaseProvider } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import CustomTabar from './screens/CustomTabar';
 
+
+
 // Redux
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
 import beerInfo from './reducers/beerInfo.reducer';
+import SignIn from './screens/SignIn';
 import location from './reducers/location.reducer';
 import selectedBrewerie from "./reducers/selectedBrewerie.reducer";
 
