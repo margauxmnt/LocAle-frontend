@@ -32,6 +32,15 @@ export default function BeerList({ navigation }) {
     }
 
 
+    const addToWishlist = async (beer) => {
+        await fetch(`http://172.16.191.137:3000/users/add-To-Wishlist/${beer._id}`)
+        /**ajoute en DB de l'utilisateur 
+         * ajoute dans le store
+         * si il y est déjà on supprime 
+         */
+    }
+
+
     const starByNote = (s) => {
         return s()
     }
@@ -98,7 +107,7 @@ export default function BeerList({ navigation }) {
                                 <IconI onPress={() => moreInfoBeer(el)} style={styles.iconeI} name="info" size={30} ></IconI>
                             </View>
 
-                            <IconM name="heart-plus" size={35} color="#FAE16C"></IconM>
+                            <IconM onPress={() => addToWishlist(el)} name="heart-plus" size={35} color="#FAE16C"></IconM>
 
                             <Text style={styles.note}>
                                 {starByNote(() => {
