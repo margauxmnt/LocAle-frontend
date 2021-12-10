@@ -31,15 +31,16 @@ function TypeaheadUsingComponentWithRenderItem(props) {
     }, [filterText]);
 
     const selectSearch = async (item) => {
+        console.log(item)
         if (item !== null) {
             if (data[item].note !== undefined) {
-                const request = await fetch(`http://172.16.191.137:3000/get-beer/${data[item].id}`)
+                const request = await fetch(`http://172.16.190.135:3000/get-beer/${data[item].id}`)
                 const result = await request.json()
                 dispatch({ type: 'updateBeer', beerInfo: result })
                 setFilterText('')
                 props.navigation.navigate('StackNav', { screen: 'BeerInfo' })
             } else {
-                const request = await fetch(`http://172.16.191.137:3000/get-brewery/${data[item].id}`);
+                const request = await fetch(`http://172.16.190.135:3000/get-brewery/${data[item].id}`);
                 const result = await request.json()
                 dispatch({ type: 'selectedBrewerie', brewery: result })
                 setFilterText('')
