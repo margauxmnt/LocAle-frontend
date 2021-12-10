@@ -3,12 +3,12 @@ import { View, Text, StyleSheet } from 'react-native';
 import { NativeBaseProvider, Avatar, Button, ScrollView, Image } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
-//import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Profile({ navigation }) {
 
     //récupération du token dans le store
-    //const token = useSelector(store => store.token)
+    // const token = useSelector(store => store.token)
     const token = "XAL39AFZCGMyhLD6Quw11nXJHggbrm4A";
     //variable contenant les infos de l'utilisateur
     const [user, setUser] = useState([{}]);
@@ -96,7 +96,7 @@ export default function Profile({ navigation }) {
                             </View>
                         </View>
     
-                        <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 60 }}>
+                        <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
                             <Button
                                 onPress={() => navigation.navigate('Wishlist')}
                                 style={styles.toWishlist}
