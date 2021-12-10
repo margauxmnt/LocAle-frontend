@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, Button, KeyboardAvoidingView } from 'react-native'
-import { Input } from 'react-native-elements'
+import { View, Text, StyleSheet, Image, Button } from 'react-native'
+import { Input, NativeBaseProvider } from "native-base"
 import { useDispatch } from 'react-redux';
+
 
 
 
@@ -99,7 +100,7 @@ export default function Log({navigation}) {
 
 
     return (
-        <View style={{flex: 1}}>
+        <NativeBaseProvider style={{flex: 1}}>
 
             <View style={{ display: display, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
 
@@ -138,9 +139,9 @@ export default function Log({navigation}) {
                 <View>
 
                     <View style={styles.backgroundColorInput}>
-                        <Input style={styles.input} onChangeText={(value) => setSignUpPseudo(value)} value={signUpPseudo} placeholder='Pseudo'></Input>
-                        <Input style={styles.input} onChangeText={(value) => setSignUpEmail(value)} value={signUpEmail} placeholder='Email'></Input>
-                        <Input style={styles.input} onChangeText={(value) => setSignUpPassword(value)} value={signUpPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
+                        <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignUpPseudo(value)} value={signUpPseudo} placeholder='Pseudo'></Input>
+                        <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignUpEmail(value)} value={signUpEmail} placeholder='Email'></Input>
+                        <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignUpPassword(value)} value={signUpPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
                     </View>
 
                     <View style={styles.button}>
@@ -171,8 +172,8 @@ export default function Log({navigation}) {
                     <View>
 
                         <View style={styles.backgroundColorInput}>
-                            <Input style={styles.input} onChangeText={(value) => setSignInEmail(value)} value={signInEmail} placeholder='Email'></Input>
-                            <Input style={styles.input} onChangeText={(value) => setSignInPassword(value)} value={signInPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
+                            <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignInEmail(value)} value={signInEmail} placeholder='Email'></Input>
+                            <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignInPassword(value)} value={signInPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
                         </View>
 
                         <View style={styles.button}>
@@ -186,7 +187,7 @@ export default function Log({navigation}) {
                 </View>
 
             </View>
-        </View>
+        </NativeBaseProvider>
     )
 
 }
