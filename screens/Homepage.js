@@ -49,7 +49,7 @@ export default function Homepage({ navigation }) {
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries() {
             //attention ADRESSE IP à changer en fonction
-            let rawResponse = await fetch(`http://172.16.190.135:3000/get-breweries?position=${JSON.stringify(location)}`);
+            let rawResponse = await fetch(`http://172.16.191.137:3000/get-breweries?position=${JSON.stringify(location)}`);
             var response = await rawResponse.json();
             if (response) {
                 setBreweries(response.breweries);
