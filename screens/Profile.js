@@ -20,32 +20,11 @@ export default function Profile({ navigation }) {
             let rawResponse = await fetch(`http://172.16.190.135:3000/users/get-user-infos?token=${token}`);
             let response = await rawResponse.json();
             // si le token correspond on met à jour les infos pour dynamiser la page, sinon on renvoie sur la page LOG (à changer ci-dessous)
-            console.log(response.user)
             response.message ? setUser(response.user) : navigation.navigate('StackNav', {screen : 'Homepage'});
         }; getUserInfos();
     }, []);
 
-    let notesCard = user[0].notes.map(function (note, i){
-        return (
-        <View key={i} style={styles.card}>
-            <View>
-                <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image' />
-            </View>
-            <View style={{ marginLeft: 10, width: '75%' }}>
-                <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
-                <View style={{ alignItems: 'center' }}>
-                    <View style={styles.starContainer}>
-                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                    </View>
-                    <Text style={{ color: '#194454', fontWeight: 'bold' }}>commentaire</Text>
-                </View>
-            </View>
-        </View>)
-    })
+    console.log(user[0].notes);
 
     if (token) {
 
@@ -111,7 +90,60 @@ export default function Profile({ navigation }) {
 
                     {/** si il y a des commentaires laissés pas l'utilisateur  */}
                     <ScrollView>
-                        {notesCard}
+                        <View style={styles.card}>
+                            <View>
+                                <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image' />
+                            </View>
+                            <View style={{ marginLeft: 10, width: '75%' }}>
+                                <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                                <View style={{ alignItems: 'center' }}>
+                                    <View style={styles.starContainer}>
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    </View>
+                                    <Text style={{ color: '#194454', fontWeight: 'bold' }}>commentaire</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={styles.card}>
+                            <View>
+                                <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image' />
+                            </View>
+                            <View style={{ marginLeft: 10, width: '75%' }}>
+                                <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                                <View style={{ alignItems: 'center' }}>
+                                    <View style={styles.starContainer}>
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    </View>
+                                    <Text style={{ color: '#194454', fontWeight: 'bold' }}>commentaire</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={styles.card}>
+                            <View>
+                                <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image' />
+                            </View>
+                            <View style={{ marginLeft: 10, width: '75%' }}>
+                                <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                                <View style={{ alignItems: 'center' }}>
+                                    <View style={styles.starContainer}>
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    </View>
+                                    <Text style={{ color: '#194454', fontWeight: 'bold' }}>commentaire</Text>
+                                </View>
+                            </View>
+                        </View>
                     </ScrollView>
 
                 </View >
