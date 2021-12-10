@@ -31,6 +31,12 @@ export default function BeerList({ navigation }) {
         navigation.navigate('BeerInfo')
     }
 
+
+    const starByNote = (s) => {
+        return s()
+    }
+
+
     return (
         <View style={{ backgroundColor: '#194454', flex: 1 }}>
             <View style={styles.topBar} >
@@ -69,11 +75,19 @@ export default function BeerList({ navigation }) {
                             </Text>
 
                             <View style={styles.stars}>
-                                <Icon name="star" size={25} color="#FAE16C" style={{ marginRight: 2 }}></Icon>
-                                <Icon name="star" size={25} color="#FAE16C" style={{ marginRight: 2 }}></Icon>
-                                <Icon name="star" size={25} color="#FAE16C" style={{ marginRight: 2 }}></Icon>
-                                <Icon name="star" size={25} color="#FAE16C" style={{ marginRight: 2 }}></Icon>
-                                <Icon name="star" size={25} color="#FAE16C" style={{ marginRight: 2 }}></Icon>
+                                {starByNote(() => {
+                                    let globalNote = 0;
+                                    el.notes.forEach(e => globalNote += e.note)
+                                    globalNote = Math.floor(globalNote / el.notes.length)
+
+                                    let stars = [];
+                                    for (let i = 0; i < 5; i++) {
+                                        if (globalNote > i) {
+                                            stars.push(<Icon style={{ marginRight: 2 }} name="star" size={25} color="#FAE16C" />)
+                                        } else stars.push(<Icon style={{ marginRight: 2 }} name="star" size={25} color="#FEF5CB" />)
+                                    }
+                                    return stars
+                                })}
                             </View>
 
                         </View>
@@ -86,7 +100,15 @@ export default function BeerList({ navigation }) {
 
                             <IconM name="heart-plus" size={35} color="#FAE16C"></IconM>
 
-                            <Text style={styles.note}>4.2</Text>
+                            <Text style={styles.note}>
+                                {starByNote(() => {
+                                    let globalNote = 0;
+                                    el.notes.forEach(e => globalNote += e.note);
+                                    globalNote = globalNote / el.notes.length;
+                                    if(isNaN(globalNote)) return 0
+                                    else return globalNote
+                                })}
+                            </Text>
 
                         </View>
 

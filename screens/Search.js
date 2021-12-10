@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 function TypeaheadUsingComponentWithRenderItem(props) {
 
-    const [filterText, setFilterText] = React.useState('');
+    const [filterText, setFilterText] = useState('');
     const dispatch = useDispatch();
     const [data, setData] = useState([])
 
@@ -30,29 +30,31 @@ function TypeaheadUsingComponentWithRenderItem(props) {
         );
     }, [filterText]);
 
-    const selectSearch = (item) => {
-        if (data[item].note !== undefined) {
-            (async () => {
-                const request = await fetch(`http://172.16.190.135:3000/get-beer/${data[item].id}`)
+    const selectSearch = async (item) => {
+        if (item !== null) {
+            if (data[item].note !== undefined) {
+                const request = await fetch(`http://172.16.191.137:3000/get-beer/${data[item].id}`)
                 const result = await request.json()
                 dispatch({ type: 'updateBeer', beerInfo: result })
-            })()
-            props.navigation.navigate('Homepage', { screen: 'BeerInfo' })
-        } else {
-            (async () => {
-                const request = await fetch(`http://172.16.190.135:3000/get-brewery/${data[item].id}`);
+                setFilterText('')
+                props.navigation.navigate('StackNav', { screen: 'BeerInfo' })
+            } else {
+                const request = await fetch(`http://172.16.191.137:3000/get-brewery/${data[item].id}`);
                 const result = await request.json()
                 dispatch({ type: 'selectedBrewerie', brewery: result })
-            })()
-            props.navigation.navigate('Homepage')
+                setFilterText('')
+                props.navigation.navigate('Homepage')
+            }
         }
     }
 
 
     return (
         <Typeahead
+            value={''}
             options={filteredItems}
-            onChange={setFilterText}
+            inputValue={filterText}
+            onChange={(v) => setFilterText(v)}
             getOptionLabel={(item) => item.name}
             getOptionKey={(item) => item.key}
             onSelectedItemChange={(value) => selectSearch(value)}
