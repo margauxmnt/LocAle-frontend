@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { NativeBaseProvider, Avatar, Button, ScrollView } from 'native-base';
+import { NativeBaseProvider, Avatar, Button, ScrollView, Image } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default function Profile() {
+export default function Profile({ navigation }) {
     return (
         <NativeBaseProvider>
 
@@ -23,7 +23,7 @@ export default function Profile() {
                             size="xl"
                             source={require('../assets/logo_matth_transparent.png')}
                         />
-                        <Icon name="edit" size={15} color={'#194454'}/>
+                        <Icon name="edit" size={15} color={'#194454'} style={styles.editAvatar}/>
                     </View>
                     
                     <View style={styles.userInfos}>
@@ -43,6 +43,7 @@ export default function Profile() {
 
                 <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 60 }}>
                     <Button
+                        onPress={() => navigation.navigate('Wishlist')}
                         style={styles.toWishlist}
                         size="lg"
                         leftIcon={<Ionicons name="heart-outline" size={35} color="#fff"/>}
@@ -52,20 +53,72 @@ export default function Profile() {
                     </Button>
                 </View>
 
-                <View style={styles.notes}>
-                        <Text style={styles.historique}>Mon historique de notes</Text>
-                    
-                    {/** si pas de commentaires laissés  */}
-                    <View style={styles.card}>
-                        <Text >Vous n'avez pas encore laissé de notes ou commentaires</Text>
-                    </View>
-
-                    {/** si il y a des commentaires laissés pas l'utilisateur  */}
-
-                    <ScrollView>
-                    </ScrollView>
-
+                <View style={styles.headerNotes}>
+                        <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
                 </View>
+                    
+                {/** si pas de commentaires laissés  */}
+                <View style={styles.card}>
+                    <Text style={{color: '#194454'}}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
+                </View>
+
+                {/** si il y a des commentaires laissés pas l'utilisateur  */}
+                <ScrollView>
+                    <View style={styles.card}>
+                        <View>
+                            <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image'/>
+                        </View>
+                        <View style={{marginLeft: 10, width: '75%'}}>
+                            <Text style={{color: '#194454', fontSize: 11}}>Date</Text>
+                            <View style={{alignItems: 'center'}}>
+                                <View style={styles.starContainer}>
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                </View>
+                                <Text style={{color: '#194454', fontWeight: 'bold'}}>commentaire</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.card}>
+                        <View>
+                            <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image'/>
+                        </View>
+                        <View style={{marginLeft: 10, width: '75%'}}>
+                            <Text style={{color: '#194454', fontSize: 11}}>Date</Text>
+                            <View style={{alignItems: 'center'}}>
+                                <View style={styles.starContainer}>
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                </View>
+                                <Text style={{color: '#194454', fontWeight: 'bold'}}>commentaire</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.card}>
+                        <View>
+                            <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image'/>
+                        </View>
+                        <View style={{marginLeft: 10, width: '75%'}}>
+                            <Text style={{color: '#194454', fontSize: 11}}>Date</Text>
+                            <View style={{alignItems: 'center'}}>
+                                <View style={styles.starContainer}>
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                                </View>
+                                <Text style={{color: '#194454', fontWeight: 'bold'}}>commentaire</Text>
+                            </View>
+                        </View>
+                    </View>
+                </ScrollView>
 
             </View >
 
@@ -105,12 +158,17 @@ const styles = StyleSheet.create({
         color: '#194454',
         margin: 10
     },
+    editAvatar: {
+        position: 'absolute',
+        right: 3,
+        top: 6
+    },
     toWishlist: {
         backgroundColor: '#FAE16C',
         borderRadius: 50,
         width: '60%',
     },
-    notes: {
+    headerNotes: {
         alignItems: 'center',
         width: '100%',
         borderWidth: 1,
@@ -118,9 +176,32 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
     },
-    historique: {
+    historiqueNotes: {
         color: '#194454',
         fontSize: 20,
         padding: 10,
+    },
+    card: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        borderWidth: 1,
+        borderTopWidth: 0,
+        borderColor: "#194454",
+        padding: 10,
+    },
+    beerImage: {
+        width: 50,
+        height: 80,
+        marginRight: 10
+    },
+    starContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        margin: 10,
+    },
+    star: {
+        marginRight: 5,
     },
 })

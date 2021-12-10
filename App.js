@@ -56,7 +56,7 @@ export default function App() {
           <Tab.Navigator
             screenOptions={({ route }) => ({
               tabBarIcon: ({ color }) => {
-                if (route.name === 'Homepage') {
+                if (route.name === 'StackNav') {
                   return <Image source={require('./assets/logo_matth_transparent.png')} style={styles.logo} />;
                 } else if (route.name === 'Search') {
                   return <Ionicons name="search" size={35} color={color} />;
@@ -78,7 +78,7 @@ export default function App() {
               }
             })}
           >
-            <Tab.Screen name="Homepage" component={StackNavigator} />
+            <Tab.Screen name="StackNav" component={StackNavigator} />
             <Tab.Screen name="Search" component={Search} />
             <Tab.Screen name="Wishlist" component={Wishlist} />
             <Tab.Screen name="Profile" component={Profile} />

@@ -46,7 +46,7 @@ export default function BeerInfo({navigation}) {
 
     useEffect(() => {
         const getSellers = async () => {
-            const request = await fetch(`http://192.168.1.24:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo.id}`)
+            const request = await fetch(`http://172.16.190.135:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo.id}`)
             const result = await request.json()
             setSellers(result.sellers)
         }
@@ -61,8 +61,8 @@ export default function BeerInfo({navigation}) {
     globalNote = Math.floor(globalNote / beerInfo.notes.length);
     for (let i = 0; i < 5; i++) {
         if (globalNote > i) {
-            stars.push(<Icon style={styles.star} name="star" size={30} color="#FAE16C" />)
-        } else stars.push(<Icon style={styles.star} name="star" size={30} color="#FEF5CB" />)
+            stars.push(<Icon key={i} style={styles.star} name="star" size={30} color="#FAE16C" />)
+        } else stars.push(<Icon key={i} style={styles.star} name="star" size={30} color="#FEF5CB" />)
     }
 
 
