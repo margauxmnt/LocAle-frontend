@@ -1,130 +1,127 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NativeBaseProvider, Avatar, Button, ScrollView, Image } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
+// import { useDispatch, useSelector } from 'react-redux';
 
 export default function Profile({ navigation }) {
-    return (
-        <NativeBaseProvider>
 
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Mon compte</Text>
+    //récupération du token dans le store
+    //const token = useSelector(store => store.token)
+    const token = "XAL39AFZCGMyhLD6Quw11nXJHggbrm4A";
+    //variable contenant les infos de l'utilisateur
+    const [user, setUser] = useState([{}]);
+
+    //récupération des infos de l'utilisateur à l'initialisation du composant
+    useEffect(() => {
+        async function getUserInfos() {
+            //attention ADRESSE IP à changer en fonction
+            let rawResponse = await fetch(`http://172.16.190.135:3000/users/get-user-infos?token=${token}`);
+            let response = await rawResponse.json();
+            // si le token correspond on met à jour les infos pour dynamiser la page, sinon on renvoie sur la page LOG (à changer ci-dessous)
+            console.log(response.user)
+            response.message ? setUser(response.user) : navigation.navigate('StackNav', {screen : 'Homepage'});
+        }; getUserInfos();
+    }, []);
+
+    let notesCard = user[0].notes.map(function (note, i){
+        return (
+        <View key={i} style={styles.card}>
+            <View>
+                <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image' />
             </View>
-            
-            <View style={styles.container} >
-
-                <Ionicons style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
-
-                <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
-
-                    <View style={{flexDirection: 'row'}}>
-                        <Avatar
-                            size="xl"
-                            source={require('../assets/logo_matth_transparent.png')}
-                        />
-                        <Icon name="edit" size={15} color={'#194454'} style={styles.editAvatar}/>
+            <View style={{ marginLeft: 10, width: '75%' }}>
+                <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                <View style={{ alignItems: 'center' }}>
+                    <View style={styles.starContainer}>
+                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
+                        <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
                     </View>
-                    
-                    <View style={styles.userInfos}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={{color: '#194454', fontSize: 20}}>Pseudo</Text>
-                            <Icon name="edit" size={15} style={styles.editIcon}/>
-                        </View>
-                        
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={{color: '#194454', marginTop: 5, fontSize: 15}}>Email@email.com</Text>
-                            <Icon name="edit" size={15} style={styles.editIcon} />
-                        </View>
-                        
-                        <Text style={{color: '#194454', marginTop: 15}}>Date inscription: 12/12/2021</Text>
-                    </View>
+                    <Text style={{ color: '#194454', fontWeight: 'bold' }}>commentaire</Text>
+                </View>
+            </View>
+        </View>)
+    })
+
+    if (token) {
+
+        return (
+            <NativeBaseProvider>
+
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>Mon compte</Text>
                 </View>
 
-                <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 60 }}>
-                    <Button
-                        onPress={() => navigation.navigate('Wishlist')}
-                        style={styles.toWishlist}
-                        size="lg"
-                        leftIcon={<Ionicons name="heart-outline" size={35} color="#fff"/>}
-                        _text={{fontSize: 20}}
+                <View style={styles.container} >
+
+                    <Ionicons style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
+
+                    <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
+
+                        <View style={{ flexDirection: 'row' }}>
+                            <Avatar
+                                size="xl"
+                                source={require('../assets/logo_matth_transparent.png')}
+                            />
+                            <Icon name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
+                        </View>
+
+                        <View style={styles.userInfos}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', fontSize: 20 }}>{user[0].pseudo}</Text>
+                                <Icon name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user[0].email}</Text>
+                                <Icon name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <Text style={{ color: '#194454', marginTop: 15 }}>
+                                Date inscription: 12/12/2012
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 60 }}>
+                        <Button
+                            onPress={() => navigation.navigate('Wishlist')}
+                            style={styles.toWishlist}
+                            size="lg"
+                            leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
+                            _text={{ fontSize: 20 }}
                         >
-                        Mes Favorites
-                    </Button>
-                </View>
+                            Mes Favorites
+                        </Button>
+                    </View>
 
-                <View style={styles.headerNotes}>
+                    <View style={styles.headerNotes}>
                         <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
-                </View>
-                    
-                {/** si pas de commentaires laissés  */}
-                <View style={styles.card}>
-                    <Text style={{color: '#194454'}}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
-                </View>
-
-                {/** si il y a des commentaires laissés pas l'utilisateur  */}
-                <ScrollView>
-                    <View style={styles.card}>
-                        <View>
-                            <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image'/>
-                        </View>
-                        <View style={{marginLeft: 10, width: '75%'}}>
-                            <Text style={{color: '#194454', fontSize: 11}}>Date</Text>
-                            <View style={{alignItems: 'center'}}>
-                                <View style={styles.starContainer}>
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                </View>
-                                <Text style={{color: '#194454', fontWeight: 'bold'}}>commentaire</Text>
-                            </View>
-                        </View>
                     </View>
-                    <View style={styles.card}>
-                        <View>
-                            <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image'/>
-                        </View>
-                        <View style={{marginLeft: 10, width: '75%'}}>
-                            <Text style={{color: '#194454', fontSize: 11}}>Date</Text>
-                            <View style={{alignItems: 'center'}}>
-                                <View style={styles.starContainer}>
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                </View>
-                                <Text style={{color: '#194454', fontWeight: 'bold'}}>commentaire</Text>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={styles.card}>
-                        <View>
-                            <Image style={styles.beerImage} source={require('../assets/Champ-Libre-1-768x1152.jpeg')} alt='Image'/>
-                        </View>
-                        <View style={{marginLeft: 10, width: '75%'}}>
-                            <Text style={{color: '#194454', fontSize: 11}}>Date</Text>
-                            <View style={{alignItems: 'center'}}>
-                                <View style={styles.starContainer}>
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                    <Icon style={styles.star} name="star" size={27} color="#FAE16C" />
-                                </View>
-                                <Text style={{color: '#194454', fontWeight: 'bold'}}>commentaire</Text>
-                            </View>
-                        </View>
-                    </View>
-                </ScrollView>
 
-            </View >
+                    {/** si pas de commentaires laissés  */}
 
-        </NativeBaseProvider>
-    )
-}
+                    {/* <View style={styles.card}>
+                        <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
+                    </View> */}
+
+                    {/** si il y a des commentaires laissés pas l'utilisateur  */}
+                    <ScrollView>
+                        {notesCard}
+                    </ScrollView>
+
+                </View >
+
+            </NativeBaseProvider>
+        )
+    } else {
+        navigation.navigate('StackNav', {screen : 'Homepage'});
+    }
+};
 
 const styles = StyleSheet.create({
     header: {
