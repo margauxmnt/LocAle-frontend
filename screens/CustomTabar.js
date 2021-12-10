@@ -55,7 +55,7 @@ export default function CustomTabar() {
 
       })}
     >
-      <Tab.Screen name="stack" component={StackNavigator} />
+      <Tab.Screen name="StackNav" component={StackNavigator} />
       <Tab.Screen name="Search" component={Search} />
       <Tab.Screen name="Wishlist" component={Wishlist} />
       <Tab.Screen name="Profile" component={Profile} />
