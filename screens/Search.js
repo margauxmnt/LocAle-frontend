@@ -37,7 +37,7 @@ function TypeaheadUsingComponentWithRenderItem(props) {
                 const result = await request.json()
                 dispatch({ type: 'updateBeer', beerInfo: result })
                 setFilterText('')
-                props.navigation.navigate('Homepage', { screen: 'BeerInfo' })
+                props.navigation.navigate('StackNav', { screen: 'BeerInfo' })
             } else {
                 const request = await fetch(`http://172.16.191.137:3000/get-brewery/${data[item].id}`);
                 const result = await request.json()

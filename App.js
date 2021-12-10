@@ -21,11 +21,11 @@ import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
 import beerInfo from './reducers/beerInfo.reducer';
-import SignIn from './screens/SignIn';
 import location from './reducers/location.reducer';
 import selectedBrewerie from "./reducers/selectedBrewerie.reducer";
+import token from './reducers/token.reducer';
 
-const store = createStore(combineReducers({ breweries, beerInfo, location, selectedBrewerie}));
+const store = createStore(combineReducers({ breweries, beerInfo, location, selectedBrewerie, token}));
 
 export default function App() {
   return (

@@ -10,6 +10,7 @@ import Search from './Search';
 import Profile from './Profile';
 import BeerList from './BeerList';
 import BeerInfo from './BeerInfo';
+import Log from './Log';
 
 const HomeStack = createNativeStackNavigator();
 
@@ -19,17 +20,19 @@ const StackNavigator = () => {
       <HomeStack.Screen name="Homepage" component={Homepage} />
       <HomeStack.Screen name="BeerList" component={BeerList} />
       <HomeStack.Screen name="BeerInfo" component={BeerInfo} />
+      <HomeStack.Screen name="Log" component={Log} />
     </HomeStack.Navigator>
   )
 }
 
 const Tab = createBottomTabNavigator();
-export default function CustomTabar(props) {
+
+export default function CustomTabar() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => {
-          if (route.name === 'Homepage') {
+          if (route.name === 'StackNav') {
             return <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />;
           } else if (route.name === 'Search') {
             return <Ionicons name="search" size={35} color={color} />;
@@ -52,7 +55,7 @@ export default function CustomTabar(props) {
 
       })}
     >
-      <Tab.Screen name="Homepage" component={StackNavigator} />
+      <Tab.Screen name="stack" component={StackNavigator} />
       <Tab.Screen name="Search" component={Search} />
       <Tab.Screen name="Wishlist" component={Wishlist} />
       <Tab.Screen name="Profile" component={Profile} />

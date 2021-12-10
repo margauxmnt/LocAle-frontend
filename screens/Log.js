@@ -1,90 +1,105 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, Button, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Image, Button, KeyboardAvoidingView } from 'react-native'
 import { Input } from 'react-native-elements'
+import { useDispatch } from 'react-redux';
 
 
 
-export default function Log(props) {
+export default function Log({navigation}) {
+
+    const dispatch = useDispatch()
 
     /*Log*/
     const [display, setDisplay] = useState('flex')
     const [displayTwo, setDisplayTwo] = useState('flex')
 
     const toogle = () => {
-        console.log('clic1')
         display === 'flex' ? setDisplay('none') : setDisplay('flex')
     }
 
     const toogleTwo = () => {
-        console.log('clic2')
         displayTwo === 'flex' ? setDisplayTwo('none') : setDisplayTwo('flex')
     }
 
 
-    
+
 
     /*SignUp*/
     const [signUpPseudo, setSignUpPseudo] = useState('')
     const [signUpEmail, setSignUpEmail] = useState('')
     const [signUpPassword, setSignUpPassword] = useState('')
 
-    const [listErrorsSignup, setErrorsSignup] = useState([])
+    const [errorSignup, setErrorSignup] = useState('')
 
 
     var handleSubmitSignup = async () => {
 
-
-        const data = await fetch('http://192.168.1.111:3000/users/sign-up', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
-        })
-
-        const body = await data.json()
-
-        if (body.result == true) {
-            props.addToken(body.token)
-            setUserExists(true)
-
-        } else {
-            setErrorsSignup(body.error)
-        }
+        if(signUpPseudo !== '' || signUpEmail !== '' || signUpPassword !== ''){
+            const request = await fetch('http://172.16.191.137:3000/users/sign-up', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
+            })
+            const result = await request.json()
+    
+            if(result.error === ''){
+                dispatch({type: 'addToken', token: result.token})
+                navigation.navigate('Profile')
+            }else if(result.error === 'Vous avez déjà un compte.') {
+                setErrorSignin(result.error)
+                setSignInEmail(signUpEmail)
+                setSignUpEmail('')
+                setSignUpPassword('')
+                setSignUpPseudo('')
+                toogleTwo()
+            }else {
+                setErrorSignup(result.error)
+                setSignUpPseudo('')
+            }
+    
+        }else setErrorSignup('Un des champs est manquant !')
     }
 
     /*Sign In*/
     const [signInEmail, setSignInEmail] = useState('')
     const [signInPassword, setSignInPassword] = useState('')
 
-    const [listErrorsSignin, setErrorsSignin] = useState([])
+    const [errorSignin, setErrorSignin] = useState('')
 
 
     let handleSubmitSignin = async () => {
- 
-        const data = await fetch('http://192.168.1.111:3000/users/sign-in', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: `email=${signInEmail}&password=${signInPassword}`
-        })
+
+        if(signInEmail !== '' || signInPassword !== ''){
+            const request = await fetch('http://172.16.191.137:3000/users/sign-in', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `email=${signInEmail}&password=${signInPassword}`
+            })
+            const result = await request.json()
     
-        const body = await data.json()
-    
-        if(body.result == true){
-          props.addToken(body.token)
-          setUserExists(true)
-          
-        }  else {
-          setErrorsSignin(body.error)
-        }
-      }
-    
-      let tabErrorsSignin = listErrorsSignin.map((error,i) => {
-        return(<Text>{error}</Text>)
-      })
+            if(result.error === ''){
+                dispatch({type: 'addToken', token: result.token})
+                navigation.navigate('Profile')
+            }else if(result.error === 'Mot de passe incorrect.'){
+                setSignInPassword('')
+                setErrorSignin(result.error)
+            }else if(result.error === 'Pas de compte avec cette adresse.'){
+                setErrorSignin('')
+                setErrorSignup(result.error)
+                setSignUpEmail(signInEmail)
+                setSignInPassword('')
+                setSignInEmail('')
+                setSignUpPassword('')
+                setSignUpPseudo('')
+                toogleTwo()
+            }
+        }else setErrorSignin('Un des champs est manquant !')        
+    }
 
 
 
     return (
-        <>
+        <View style={{flex: 1}}>
 
             <View style={{ display: display, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
 
@@ -92,11 +107,10 @@ export default function Log(props) {
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
-
                 <View>
 
                     <View style={styles.backgroundTexte}>
-                        <Button onPress={() => toogle()} style={styles.email} color="#fff" title="Adresse mail"></Button>
+                        <Button onPress={() => toogle()} style={styles.email} color="#194454" title="Adresse mail"></Button>
                     </View>
 
                     <View style={styles.backgroundTexte}>
@@ -112,67 +126,67 @@ export default function Log(props) {
             </View>
 
 
-
+            {/* SIGN UP */}
             <View style={{ display: displayTwo, height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
 
                 <View>
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
+                <Text style={{color: '#e63946'}}>{errorSignup}</Text>
 
                 <View>
 
                     <View style={styles.backgroundColorInput}>
                         <Input style={styles.input} onChangeText={(value) => setSignUpPseudo(value)} value={signUpPseudo} placeholder='Pseudo'></Input>
                         <Input style={styles.input} onChangeText={(value) => setSignUpEmail(value)} value={signUpEmail} placeholder='Email'></Input>
-                        <Input style={styles.input} onChangeText={(value) => setSignUpPassword(value)} value={signUpPassword} placeholder='Mot de passe'></Input>
+                        <Input style={styles.input} onChangeText={(value) => setSignUpPassword(value)} value={signUpPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
                     </View>
-
-
 
                     <View style={styles.button}>
-                        <Button color="#fff" title="Valider" onPress={() => handleSubmitSignup()}></Button>
+                        <Button title="Valider" color="#194454" onPress={() => handleSubmitSignup()}></Button>
                     </View>
 
-                    <View style={styles.compte}>
-                        <Button color="#fff" title='Déjà un compte ?' textAlign='left' onPress={() => toogleTwo()}></Button>
-                    </View>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                        <Text onPress={() => toogleTwo()} style={styles.text}>Déjà un compte ?</Text>
+                        <Text onPress={() => toogle()} style={styles.text}>Se connecter autrement.</Text>
+                    </View>                    
 
                 </View>
 
             </View>
 
 
-
-            <View style={{ display: 'flex', height:'100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
+            {/* SIGN IN */}
+            <View style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
 
                 <View>
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
+                <Text style={{color: '#e63946'}}>{errorSignin}</Text>
 
                 <View style={styles.containerButton}>
 
                     <View>
+
                         <View style={styles.backgroundColorInput}>
                             <Input style={styles.input} onChangeText={(value) => setSignInEmail(value)} value={signInEmail} placeholder='Email'></Input>
-                            <Input style={styles.input} onChangeText={(value) => setSignInPassword(value)} value={signInPassword} placeholder='Mot de passe'></Input>
+                            <Input style={styles.input} onChangeText={(value) => setSignInPassword(value)} value={signInPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
                         </View>
-
-
 
                         <View style={styles.button}>
-                            <Button color="#fff" title="Valider" onPress={() => handleSubmitSignin()}></Button>
+                            <Button title="Valider" color="#194454" onPress={() => handleSubmitSignin()}></Button>
                         </View>
 
+                        <Text onPress={() => toogleTwo()} style={styles.text}>Pas encore de compte ?</Text>
 
                     </View>
 
                 </View>
 
             </View>
-
-        </>
+        </View>
     )
 
 }
@@ -227,6 +241,10 @@ const styles = StyleSheet.create({
     texteCompte: {
         color: 'white',
         fontSize: 15,
+    },
+    text: {
+        color: 'lightblue',
+        margin: 10,
     }
 
 })
