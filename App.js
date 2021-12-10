@@ -23,11 +23,14 @@ import Profile from './screens/Profile';
 import BeerList from './screens/BeerList';
 import BeerInfo from './screens/BeerInfo';
 
+
+
 // Redux
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
 import beerInfo from './reducers/beerInfo.reducer';
+import SignIn from './screens/SignIn';
 const store = createStore(combineReducers({ breweries, beerInfo }));
 
 
