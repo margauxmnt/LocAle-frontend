@@ -20,7 +20,7 @@ const StackNavigator = () => {
       <HomeStack.Screen name="Homepage" component={Homepage} />
       <HomeStack.Screen name="BeerList" component={BeerList} />
       <HomeStack.Screen name="BeerInfo" component={BeerInfo} />
-      {/* <HomeStack.Screen name="Log" component={Log} /> */}
+      <HomeStack.Screen name="Log" component={Log} />
     </HomeStack.Navigator>
   )
 }
@@ -58,7 +58,7 @@ export default function CustomTabar() {
       <Tab.Screen name="stack" component={StackNavigator} />
       <Tab.Screen name="Search" component={Search} />
       <Tab.Screen name="Wishlist" component={Wishlist} />
-      <Tab.Screen name="Profile" component={Log} />
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   )
 }
