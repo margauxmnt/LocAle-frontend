@@ -30,7 +30,7 @@ export default function BeerInfo({ navigation }) {
 
     useEffect(() => {
         const getSellers = async () => {
-            const request = await fetch(`http://172.16.191.137:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
+            const request = await fetch(`http://192.168.43.159:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
             const result = await request.json()
             setSellers(result.sellers)
         }
@@ -119,7 +119,7 @@ export default function BeerInfo({ navigation }) {
 
 
     const goBack = async () => {
-        const request = await fetch(`http://172.16.191.137:3000/get-brewery-from-beer/${beerInfo._id}`)
+        const request = await fetch(`http://192.168.43.159:3000/get-brewery-from-beer/${beerInfo._id}`)
         const result = await request.json()
         dispatch({type: 'selectedBrewerie', brewery: result})
         navigation.navigate('BeerList')
@@ -127,7 +127,7 @@ export default function BeerInfo({ navigation }) {
 
 
     const addNote = async () => {
-        const request = await fetch('http://172.16.191.137:3000/users/add-note', {
+        const request = await fetch('http://192.168.43.159:3000/users/add-note', {
             method: 'POST',
             headers: {'Content-Type':'application/x-www-form-urlencoded'},
             body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
