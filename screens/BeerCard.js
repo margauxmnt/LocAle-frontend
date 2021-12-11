@@ -18,6 +18,7 @@ export default function BeerCard(props) {
         return s()
     }
 
+    
 
     return (
         <View style={styles.containerParent} >

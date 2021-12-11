@@ -4,12 +4,15 @@ import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconI from 'react-native-vector-icons/AntDesign';
+import BeerCard from './BeerCard';
+import { useIsFocused } from '@react-navigation/native';
 
 const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A'
 export default function Wishlist({ navigation }) {
 
     // const token = useSelector(store => store.token)
     const [beers, setBeers] = useState([])
+    const isFocused = useIsFocused();
 
     if (token === '') {
         navigation.navigate('StackNav', { screen: 'Log' })
@@ -19,12 +22,20 @@ export default function Wishlist({ navigation }) {
         (async () => {
             const request = await fetch(`http://192.168.43.159:3000/get-wishlist/${token}`)
             const result = await request.json()
-            console.log(result)
             setBeers(result)
         })()
     }, [])
 
+    const moveFromWishlist = async (beer, isInWishlist) => {
+        setBeers(beers.filter(e => e._id !== beer._id))
+        const request = await fetch(`http://192.168.43.159:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+        const result = await request.json()
+    }
 
+    const cards = beers.map((el, i) => {
+        let isInWishlist = true;
+        return <BeerCard key={i} isInWishlist={isInWishlist} indice={i} beer={el} addToWishlist={moveFromWishlist} />
+    })
 
     return (
         <View style={{ backgroundColor: '#194454', flex: 1 }}>
@@ -33,67 +44,7 @@ export default function Wishlist({ navigation }) {
             </View>
 
             <ScrollView>
-                {beers.map((el, i) => (
-                    <View key={i} style={styles.containerParent} >
-
-                        <View>
-                            <Image style={styles.image} source={{ uri: el.picture }}></Image>
-                        </View>
-
-                        <View style={styles.containerChildTwo}>
-
-                            <Text style={{ fontWeight: 'bold', color: '#194454', fontSize: 20 }}>
-                                {el.name}
-                            </Text>
-
-                            <Text style={styles.texteType}>
-                                {el.type}
-                            </Text>
-
-                            <Text style={styles.texte}>
-                                {el.alcool + '% Alc.'}
-                            </Text>
-
-                            <View style={styles.stars}>
-                                {starByNote(() => {
-                                    let globalNote = 0;
-                                    el.notes.forEach(e => globalNote += e.note)
-                                    globalNote = Math.floor(globalNote / el.notes.length)
-
-                                    let stars = [];
-                                    for (let i = 0; i < 5; i++) {
-                                        if (globalNote > i) {
-                                            stars.push(<Icon style={{ marginRight: 2 }} name="star" size={25} color="#FAE16C" />)
-                                        } else stars.push(<Icon style={{ marginRight: 2 }} name="star" size={25} color="#FEF5CB" />)
-                                    }
-                                    return stars
-                                })}
-                            </View>
-
-                        </View>
-
-                        <View style={styles.containerChildThree}>
-
-                            <View style={styles.backgroundIcone}>
-                                <IconI onPress={() => moreInfoBeer(el)} style={styles.iconeI} name="info" size={30} ></IconI>
-                            </View>
-
-                            <IconM name="heart-plus" size={35} color="#FAE16C"></IconM>
-
-                            <Text style={styles.note}>
-                                {starByNote(() => {
-                                    let globalNote = 0;
-                                    el.notes.forEach(e => globalNote += e.note);
-                                    globalNote = globalNote / el.notes.length;
-                                    if (isNaN(globalNote)) return 0
-                                    else return globalNote
-                                })}
-                            </Text>
-
-                        </View>
-
-                    </View>
-                ))}
+                {cards}
             </ScrollView>
         </View>
     )

@@ -55,7 +55,7 @@ export default function BeerList({ navigation }) {
                 isInWishlist = true
             }
         })
-        return <BeerCard key={i} isInWishlist={isInWishlist} indice={i} beer={el} wishlist={wishlist} addToWishlist={addToWishlist} />
+        return <BeerCard key={i} isInWishlist={isInWishlist} indice={i} beer={el} addToWishlist={addToWishlist} />
     })
 
     return (
