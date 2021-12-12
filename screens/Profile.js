@@ -4,6 +4,7 @@ import { NativeBaseProvider, Avatar, Button, ScrollView, Image } from 'native-ba
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Profile({ navigation }) {
@@ -35,6 +36,16 @@ export default function Profile({ navigation }) {
         
         dispatch({ type: 'updateBeer', beerInfo: result })
         navigation.navigate('StackNav', {screen: 'BeerInfo'})
+    }
+
+
+    const logout = () => {
+        //non fonctionnel, redirige vers la home puis vers le login et ne remet pas à jour le profil
+        // navigation.navigate('StackNav', {screen: 'Homepage'})
+        // dispatch({type: 'addToken', token: ''})
+        // dispatch({type: 'updateWishlist', wishlist: {}})
+        // AsyncStorage.removeItem('userEmail');
+        // AsyncStorage.removeItem('userPassword');
     }
 
 
@@ -83,7 +94,7 @@ export default function Profile({ navigation }) {
 
                 <View style={styles.container} >
 
-                    <Ionicons style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
+                    <Ionicons onPress={() => logout()} style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
 
                     <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
 

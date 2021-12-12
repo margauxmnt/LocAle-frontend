@@ -37,8 +37,26 @@ export default function Homepage({ navigation }) {
     const selectedBrewerieRedux = useSelector(store => store.selectedBrewerie)
     const token = useSelector(store => store.token)
 
-    //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
+    
     useEffect(() => {
+
+        // check si l'utilisateur est déjà connecté ou non
+        AsyncStorage.getItem('userEmail', (err, email) => {
+            if (email !== null) {
+                AsyncStorage.getItem('userPassword', async (err, psw) => {
+                    const request = await fetch('http://192.168.1.42:3000/users/sign-in', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `email=${email}&password=${psw}`
+                    })
+                    const result = await request.json()
+                    dispatch({type: 'addToken', token: result.token})
+                    dispatch({type: 'updateWishlist', wishlist: result.wishlist})
+                })
+            }
+        })
+
+        //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
         async function askPermission() {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status == 'granted') {

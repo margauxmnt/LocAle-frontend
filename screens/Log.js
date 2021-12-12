@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet, Image, Button } from 'react-native'
 import { Input, NativeBaseProvider } from "native-base"
 import { useDispatch } from 'react-redux';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Log({navigation}) {
@@ -43,6 +43,8 @@ export default function Log({navigation}) {
             const result = await request.json()
     
             if(result.error === ''){
+                AsyncStorage.setItem('userEmail', signUpEmail)
+                AsyncStorage.setItem('userPassword', signUpPassword)
                 dispatch({type: 'addToken', token: result.token})
                 navigation.navigate('Profile')
             }else if(result.error === 'Vous avez déjà un compte.') {
@@ -78,6 +80,16 @@ export default function Log({navigation}) {
             const result = await request.json()
     
             if(result.error === ''){
+                // on vérifie si c'est un nouvel appareil et si il y a quelque chose dans le cache
+                // s'il n'y a rien on ajoute dans le cache
+                // si ce n'est pas un nouvel appareil et que qu'il y a quelque chose, on l'ajoute seulement si 
+                //    les identifiant de connexion sont différent
+                AsyncStorage.getItem('userEmail', (err, data) => {
+                    if(data !== signInEmail || data === null) {
+                        AsyncStorage.setItem('userEmail', signInEmail)     
+                        AsyncStorage.setItem('userPassword', signInPassword)
+                    }     
+                })
                 dispatch({type: 'addToken', token: result.token})
                 dispatch({type: 'updateWishlist', wishlist: result.wishlist})
                 navigation.navigate('Profile')

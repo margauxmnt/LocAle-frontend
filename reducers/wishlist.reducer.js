@@ -8,5 +8,6 @@ export default function (wishlist = [], action) {
         newW = newW.filter(e => e._id !== action.beer._id)
         return newW
     }
+
     else return wishlist
 }
