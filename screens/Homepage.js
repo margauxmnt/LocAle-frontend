@@ -4,12 +4,13 @@ import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useD
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import des composants pour initialiser la map et la géolocalisation
 import MapView, { Marker } from 'react-native-maps'
 import * as Location from 'expo-location';
 
-const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A';
+// const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A';
 
 export default function Homepage({ navigation }) {
 
@@ -35,9 +36,26 @@ export default function Homepage({ navigation }) {
     const isFocused = useIsFocused();
     // si une brasserie est sélectionnée, on affiche le modal et on setSelectedBrewerie
     const selectedBrewerieRedux = useSelector(store => store.selectedBrewerie)
+    const token = useSelector(store => store.token)
 
     //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
     useEffect(() => {
+        // AsyncStorage.getItem("locAleConnection", async function (error, data) {
+        //     if (error == null) {
+        //         const connection = JSON.parse(data)
+        //         const request = await fetch('http://192.168.1.42:3000/users/sign-in', {
+        //             method: 'POST',
+        //             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        //             body: `email=${connection.email}&password=${connection.password}`
+        //         })
+        //         const result = await request.json()
+        //         console.log(result.error)
+        //         dispatch({ type: 'addToken', token: result.token })
+        //         dispatch({ type: 'updateWishlist', wishlist: result.wishlist })
+        //     }
+        // });
+
+
         async function askPermission() {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status == 'granted') {
@@ -58,8 +76,12 @@ export default function Homepage({ navigation }) {
                 dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
 
                 // si l'utilisateur est connecté
-                if (response.user) dispatch({ type: 'updateWishlist', wishlist: response.user.wishlist })
+                // if (response.user) {
+                //     dispatch({ type: 'updateWishlist', wishlist: response.user.wishlist })
+                //     dispatch({ type: 'addToken', token: response.user.token })
+                // }
             };
+
         };
         searchBreweries();
     }, []);

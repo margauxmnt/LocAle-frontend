@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet, Image, Button } from 'react-native'
 import { Input, NativeBaseProvider } from "native-base"
 import { useDispatch } from 'react-redux';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -45,6 +45,7 @@ export default function Log({navigation}) {
     
             if(result.error === ''){
                 dispatch({type: 'addToken', token: result.token})
+                // AsyncStorage.setItem('locAleConnection', JSON.stringify({password: result.password, email: result.email}))
                 navigation.navigate('Profile')
             }else if(result.error === 'Vous avez déjà un compte.') {
                 setErrorSignin(result.error)
@@ -80,6 +81,7 @@ export default function Log({navigation}) {
     
             if(result.error === ''){
                 dispatch({type: 'addToken', token: result.token})
+                dispatch({type: 'updateWishlist', wishlist: result.wishlist})
                 navigation.navigate('Profile')
             }else if(result.error === 'Mot de passe incorrect.'){
                 setSignInPassword('')

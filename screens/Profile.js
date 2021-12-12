@@ -5,38 +5,47 @@ import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 
+
 export default function Profile({ navigation }) {
 
     //récupération du token dans le store
-    // const token = useSelector(store => store.token)
-    const token = "XAL39AFZCGMyhLD6Quw11nXJHggbrm4A";
+    const token = useSelector(store => store.token)
     //variable contenant les infos de l'utilisateur
-    const [user, setUser] = useState([{}]);
+    const [user, setUser] = useState({});
 
-    //récupération des infos de l'utilisateur à l'initialisation du composant
+
     useEffect(() => {
-        async function getUserInfos() {
-            //attention ADRESSE IP à changer en fonction
-            let rawResponse = await fetch(`http://192.168.1.42:3000/users/get-user-infos?token=${token}`);
-            let response = await rawResponse.json();
-            // si le token correspond on met à jour les infos pour dynamiser la page, sinon on renvoie sur la page LOG (à changer ci-dessous)
-            response.message ? setUser(response.user) : navigation.navigate('StackNav', {screen : 'Homepage'});
-        }; getUserInfos();
-    }, []);
+        if (token === '') {
+            navigation.navigate('StackNav', { screen: 'Log' });
+        } else {
+            async function getUserInfos() {
+                //attention ADRESSE IP à changer en fonction
+                let rawResponse = await fetch(`http://192.168.1.42:3000/users/get-user-infos?token=${token}`);
+                let response = await rawResponse.json();
+                // si le token correspond on met à jour les infos pour dynamiser la page, sinon on renvoie sur la page LOG (à changer ci-dessous)
+                setUser(response.user)
+            }; getUserInfos();
+        }
+    }, [token]);
+
+    console.log(token)
+    //récupération des infos de l'utilisateur à l'initialisation du composant
+
+
+
 
     // --- stars by note --- //
     const starByNote = (s) => {
-        return s()
+        return s();
     }
 
-    if (user[0].notes == undefined){
-        return <View></View>
+    if (user.notes == undefined) {
+        return <View />
     } else {
-        if (token) {
-            let userNotes = user[0].notes.map(function (el, i){
-                return <View key={i} style={styles.card}>
+        let userNotes = user.notes.map(function (el, i) {
+            return <View key={i} style={styles.card}>
                 <View>
-                    <Image style={styles.beerImage} source={{uri: el.beer.picture}} alt='Image' />
+                    <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
                 </View>
                 <View style={{ marginLeft: 10, width: '75%' }}>
                     <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
@@ -56,82 +65,80 @@ export default function Profile({ navigation }) {
                     </View>
                 </View>
             </View>
-            })
+        })
 
-            return (
-                <NativeBaseProvider>
-    
-                    <View style={styles.header}>
-                        <Text style={styles.headerText}>Mon compte</Text>
+
+        return (
+            <NativeBaseProvider>
+
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>Mon compte</Text>
+                </View>
+
+                <View style={styles.container} >
+
+                    <Ionicons style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
+
+                    <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
+
+                        <View style={{ flexDirection: 'row' }}>
+                            <Avatar
+                                size="xl"
+                                source={require('../assets/logo_matth_transparent.png')}
+                            />
+                            <Icon name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
+                        </View>
+
+                        <View style={styles.userInfos}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', fontSize: 20 }}>{user.pseudo}</Text>
+                                <Icon name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
+                                <Icon name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <Text style={{ color: '#194454', marginTop: 15 }}>
+                                Date inscription: 12/12/2012
+                            </Text>
+                        </View>
                     </View>
-    
-                    <View style={styles.container} >
-    
-                        <Ionicons style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
-    
-                        <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
-    
-                            <View style={{ flexDirection: 'row' }}>
-                                <Avatar
-                                    size="xl"
-                                    source={require('../assets/logo_matth_transparent.png')}
-                                />
-                                <Icon name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
-                            </View>
-    
-                            <View style={styles.userInfos}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={{ color: '#194454', fontSize: 20 }}>{user[0].pseudo}</Text>
-                                    <Icon name="edit" size={15} style={styles.editIcon} />
-                                </View>
-    
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user[0].email}</Text>
-                                    <Icon name="edit" size={15} style={styles.editIcon} />
-                                </View>
-    
-                                <Text style={{ color: '#194454', marginTop: 15 }}>
-                                    Date inscription: 12/12/2012
-                                </Text>
-                            </View>
-                        </View>
-    
-                        <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
-                            <Button
-                                onPress={() => navigation.navigate('Wishlist')}
-                                style={styles.toWishlist}
-                                size="lg"
-                                leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
-                                _text={{ fontSize: 20 }}
-                            >
-                                Mes Favorites
-                            </Button>
-                        </View>
-    
-                        <View style={styles.headerNotes}>
-                            <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
-                        </View>
-    
-                        {/** si pas de commentaires laissés  */}
-    
-                        {/* <View style={styles.card}>
+
+                    <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
+                        <Button
+                            onPress={() => navigation.navigate('Wishlist')}
+                            style={styles.toWishlist}
+                            size="lg"
+                            leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
+                            _text={{ fontSize: 20 }}
+                        >
+                            Mes Favorites
+                        </Button>
+                    </View>
+
+                    <View style={styles.headerNotes}>
+                        <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
+                    </View>
+
+                    {/** si pas de commentaires laissés  */}
+
+                    {/* <View style={styles.card}>
                             <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
                         </View> */}
-    
-                        {/** si il y a des commentaires laissés pas l'utilisateur  */}
-                        <ScrollView>
-                            {userNotes}
-                        </ScrollView>
-    
-                    </View >
-    
-                </NativeBaseProvider>
-            )
-        } else {
-            navigation.navigate('StackNav', {screen : 'Homepage'});
-        }
-    };
+
+                    {/** si il y a des commentaires laissés pas l'utilisateur  */}
+                    <ScrollView>
+                        {userNotes}
+                    </ScrollView>
+
+                </View >
+
+            </NativeBaseProvider>
+        )
     }
+};
 
 const styles = StyleSheet.create({
     header: {
