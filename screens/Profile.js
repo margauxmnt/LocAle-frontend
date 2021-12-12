@@ -17,7 +17,7 @@ export default function Profile({ navigation }) {
     useEffect(() => {
         async function getUserInfos() {
             //attention ADRESSE IP à changer en fonction
-            let rawResponse = await fetch(`http://172.16.191.137:3000/users/get-user-infos?token=${token}`);
+            let rawResponse = await fetch(`http://192.168.1.42:3000/users/get-user-infos?token=${token}`);
             let response = await rawResponse.json();
             // si le token correspond on met à jour les infos pour dynamiser la page, sinon on renvoie sur la page LOG (à changer ci-dessous)
             response.message ? setUser(response.user) : navigation.navigate('StackNav', {screen : 'Homepage'});
