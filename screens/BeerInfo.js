@@ -12,12 +12,12 @@ const currentPosition = {
     longitude: 4.834277,
 }
 
-const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A'
 
 export default function BeerInfo({ navigation }) {
 
     const beerInfo = useSelector(store => store.beerInfo)
     const wishlist = useSelector(store => store.wishlist)
+    const token = useSelector(store => store.token)
     const dispatch = useDispatch()
     // const currentPosition = useSelector(store => store.initialPosition)
 
@@ -133,25 +133,33 @@ export default function BeerInfo({ navigation }) {
 
 
     const addNote = async () => {
-        const request = await fetch('http://192.168.1.42:3000/users/add-note', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
-        })
-        const result = await request.json()
-        dispatch({ type: 'addBeerNote', note: result })
+        if(token !== ''){
+            const request = await fetch('http://192.168.1.42:3000/users/add-note', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
+            })
+            const result = await request.json()
+            dispatch({ type: 'addBeerNote', note: result })
+        }else {
+            navigation.navigate('StackNav', {screen: 'Log'})
+        }
     }
 
 
     const addToWishlist = async (beer, isInWishlist) => {
-        if(!isInWishlist){
-            dispatch({type: 'addToWishList', beer: beer})
-            setLike(true);
-        }else {
-            dispatch({type: 'removeFromWishlist', beer: beer})
-            setLike(false);
+        if(token !== ''){
+            if(!isInWishlist){
+                dispatch({type: 'addToWishList', beer: beer})
+                setLike(true);
+            }else {
+                dispatch({type: 'removeFromWishlist', beer: beer})
+                setLike(false);
+            }
+            await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+        }else{
+            navigation.navigate('StackNav', {screen: 'Log'})
         }
-        await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
     }
 
 

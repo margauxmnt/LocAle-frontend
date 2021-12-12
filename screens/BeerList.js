@@ -12,19 +12,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import BeerCard from "./BeerCard";
 
 
-const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A'
-
 export default function BeerList({ navigation }) {
 
     const [beers, setBeers] = useState([]);
     const dispatch = useDispatch();
     const selectedBrewerie = useSelector(store => store.selectedBrewerie)
     const wishlist = useSelector(store => store.wishlist)
+    const token = useSelector(store => store.token)
 
 
     useEffect(() => {
         async function loadData() {
-            let request = await fetch(`http://192.168.1.42:3000/get-beers/${selectedBrewerie._id}/${token}`)
+            let request = await fetch(`http://192.168.1.42:3000/get-beers/${selectedBrewerie._id}`)
             let result = await request.json()
             setBeers(result.beers)
         }
@@ -33,12 +32,16 @@ export default function BeerList({ navigation }) {
 
 
     const addToWishlist = async (beer, isInWishlist) => {
-        if(isInWishlist){
-            dispatch({type: 'addToWishList', beer: beer})
+        if(token !== ''){
+            if(isInWishlist){
+                dispatch({type: 'addToWishList', beer: beer})
+            }else {
+                dispatch({type: 'removeFromWishlist', beer: beer})
+            }
+            await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
         }else {
-            dispatch({type: 'removeFromWishlist', beer: beer})
+            navigation.navigate('StackNav', {screen: 'Log'})
         }
-        await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
     }
 
     const moreInfoBeer = (beer) => {

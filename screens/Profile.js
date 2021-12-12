@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NativeBaseProvider, Avatar, Button, ScrollView, Image } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -10,6 +10,7 @@ export default function Profile({ navigation }) {
 
     //récupération du token dans le store
     const token = useSelector(store => store.token)
+    const dispatch = useDispatch()
     //variable contenant les infos de l'utilisateur
     const [user, setUser] = useState({});
 
@@ -22,16 +23,19 @@ export default function Profile({ navigation }) {
                 //attention ADRESSE IP à changer en fonction
                 let rawResponse = await fetch(`http://192.168.1.42:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
-                // si le token correspond on met à jour les infos pour dynamiser la page, sinon on renvoie sur la page LOG (à changer ci-dessous)
                 setUser(response.user)
             }; getUserInfos();
         }
     }, [token]);
 
-    console.log(token)
-    //récupération des infos de l'utilisateur à l'initialisation du composant
 
-
+    const moreInfoBeer = async (beer) => {
+        const request = await fetch(`http://192.168.1.42:3000/get-beer/${beer._id}`)
+        const result = await request.json()
+        
+        dispatch({ type: 'updateBeer', beerInfo: result })
+        navigation.navigate('StackNav', {screen: 'BeerInfo'})
+    }
 
 
     // --- stars by note --- //
@@ -43,28 +47,30 @@ export default function Profile({ navigation }) {
         return <View />
     } else {
         let userNotes = user.notes.map(function (el, i) {
-            return <View key={i} style={styles.card}>
-                <View>
-                    <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
-                </View>
-                <View style={{ marginLeft: 10, width: '75%' }}>
-                    <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
-                    <View style={{ alignItems: 'center' }}>
-                        <View style={styles.starContainer}>
-                            {starByNote(() => {
-                                let stars = [];
-                                for (let i = 0; i < 5; i++) {
-                                    if (el.note > i) {
-                                        stars.push(<Icon style={styles.star} name="star" size={27} color="#FAE16C" />)
-                                    } else stars.push(<Icon style={styles.star} name="star" size={27} color="#FEF5CB" />)
-                                }
-                                return stars
-                            })}
-                        </View>
-                        <Text style={{ color: '#194454', fontWeight: 'bold' }}>{el.comment}</Text>
+            return (
+                <TouchableOpacity key={i} onPress={() => moreInfoBeer(el.beer)} style={styles.card}>
+                    <View>
+                        <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
                     </View>
-                </View>
-            </View>
+                    <View style={{ marginLeft: 10, width: '75%' }}>
+                        <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                        <View style={{ alignItems: 'center' }}>
+                            <View style={styles.starContainer}>
+                                {starByNote(() => {
+                                    let stars = [];
+                                    for (let i = 0; i < 5; i++) {
+                                        if (el.note > i) {
+                                            stars.push(<Icon style={styles.star} name="star" size={27} color="#FAE16C" />)
+                                        } else stars.push(<Icon style={styles.star} name="star" size={27} color="#FEF5CB" />)
+                                    }
+                                    return stars
+                                })}
+                            </View>
+                            <Text style={{ color: '#194454', fontWeight: 'bold' }}>{el.comment}</Text>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            )
         })
 
 

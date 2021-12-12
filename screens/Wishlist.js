@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import BeerCard from './BeerCard';
 
-// const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A'
 
 export default function Wishlist({ navigation }) {
 
