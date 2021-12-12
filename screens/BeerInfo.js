@@ -17,31 +17,35 @@ const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A'
 export default function BeerInfo({ navigation }) {
 
     const beerInfo = useSelector(store => store.beerInfo)
+    const wishlist = useSelector(store => store.wishlist)
     const dispatch = useDispatch()
     // const currentPosition = useSelector(store => store.initialPosition)
 
     const [sellers, setSellers] = useState([]);
-    const [like, setLike] = useState(false);
     const [region, setRegion] = useState(currentPosition)
     const [showModal, setShowModal] = useState(false)
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');
+    const [like, setLike] = useState(false)
 
 
     useEffect(() => {
         const getSellers = async () => {
-            const request = await fetch(`http://192.168.43.159:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
+            const request = await fetch(`http://192.168.1.42:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
             const result = await request.json()
             setSellers(result.sellers)
         }
         getSellers();
+
+        wishlist.forEach(e => { if (e._id === beerInfo._id) setLike(true) })
+
     }, [beerInfo])
 
 
     // --- note globale --- //
     let stars = [];
     let globalNote = 0;
-    
+
     beerInfo.notes.forEach(el => globalNote += el.note);
     globalNote = Math.floor(globalNote / beerInfo.notes.length);
     for (let i = 0; i < 5; i++) {
@@ -76,11 +80,13 @@ export default function BeerInfo({ navigation }) {
     }
 
     let BeerNotes = [];
+
     if (beerInfo.notes.length === 0) BeerNotes.push(
         <View style={{ padding: 20 }}>
             <Text style={{ width: '80%', color: "lightgrey", fontSize: 18 }}>Cette bière n'a pas encore de note, ajoute en une !</Text>
         </View>
     )
+
     else BeerNotes = beerInfo.notes.map((el, i) => (
         <View key={i} style={styles.card}>
             <View style={styles.starContainer}>
@@ -110,31 +116,44 @@ export default function BeerInfo({ navigation }) {
     ))
 
     const modalStars = [];
-    for(let i = 0; i < 5; i++){
-        if(myRating > i)
-            modalStars.push(<Icon onPress={() => setMyRating(i+1)} style={styles.star} name="star" size={35} color="#FAE16C" />)
-        else 
-            modalStars.push(<Icon onPress={() => setMyRating(i+1)} style={styles.star} name="star" size={35} color="#FEF5CB" />)
+    for (let i = 0; i < 5; i++) {
+        if (myRating > i)
+            modalStars.push(<Icon onPress={() => setMyRating(i + 1)} style={styles.star} name="star" size={35} color="#FAE16C" />)
+        else
+            modalStars.push(<Icon onPress={() => setMyRating(i + 1)} style={styles.star} name="star" size={35} color="#FEF5CB" />)
     }
 
 
     const goBack = async () => {
-        const request = await fetch(`http://192.168.43.159:3000/get-brewery-from-beer/${beerInfo._id}`)
+        const request = await fetch(`http://192.168.1.42:3000/get-brewery-from-beer/${beerInfo._id}`)
         const result = await request.json()
-        dispatch({type: 'selectedBrewerie', brewery: result})
+        dispatch({ type: 'selectedBrewerie', brewery: result })
         navigation.navigate('BeerList')
     }
 
 
     const addNote = async () => {
-        const request = await fetch('http://192.168.43.159:3000/users/add-note', {
+        const request = await fetch('http://192.168.1.42:3000/users/add-note', {
             method: 'POST',
-            headers: {'Content-Type':'application/x-www-form-urlencoded'},
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
         })
         const result = await request.json()
-        dispatch({type: 'addBeerNote', note: result})
+        dispatch({ type: 'addBeerNote', note: result })
     }
+
+
+    const addToWishlist = async (beer, isInWishlist) => {
+        if(!isInWishlist){
+            dispatch({type: 'addToWishList', beer: beer})
+            setLike(true);
+        }else {
+            dispatch({type: 'removeFromWishlist', beer: beer})
+            setLike(false);
+        }
+        await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+    }
+
 
     return (
         <NativeBaseProvider>
@@ -149,8 +168,8 @@ export default function BeerInfo({ navigation }) {
                     <View style={styles.infos}>
                         <View style={{ position: 'relative' }}>
                             <Image style={styles.image} source={{ uri: beerInfo.picture, }} />
-                            {!like ? <IconM onPress={() => setLike(!like)} style={styles.heart} name="heart-plus" size={30} color="#FAE16C" />
-                                : <IconM onPress={() => setLike(!like)} style={styles.heart} name="heart-plus" size={30} color="#A15640" />
+                            {!like ? <IconM onPress={() => addToWishlist(beerInfo, like)} style={styles.heart} name="heart-plus" size={30} color="#FAE16C" />
+                                : <IconM onPress={() => addToWishlist(beerInfo, like)} style={styles.heart} name="heart-plus" size={30} color="#A15640" />
                             }
 
                         </View>
@@ -216,7 +235,7 @@ export default function BeerInfo({ navigation }) {
                             <Modal.CloseButton />
                             <Modal.Header>Ajoute ton avis !</Modal.Header>
                             <Modal.Body>
-                                <View style={{ flexDirection: 'row'  }}>
+                                <View style={{ flexDirection: 'row' }}>
                                     {modalStars}
                                 </View>
                                 <FormControl>
@@ -349,7 +368,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    button:{
+    button: {
         backgroundColor: '#194454',
         margin: 'auto',
     }

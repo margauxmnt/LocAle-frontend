@@ -1,34 +1,45 @@
 import { LogBox } from "react-native";
 LogBox.ignoreAllLogs(true);
+
 /*Import React*/
 import React, { useState, useEffect } from "react"
-import { StyleSheet, View, Text, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 /*Icones*/
 import Icon from 'react-native-vector-icons/FontAwesome';
-
 // redux
 import { useDispatch, useSelector } from 'react-redux';
-import Wishlist from "./Wishlist";
+// composant
 import BeerCard from "./BeerCard";
+
 
 const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A'
 
 export default function BeerList({ navigation }) {
 
     const [beers, setBeers] = useState([]);
-    const [wishlist, setWishlist] = useState([]);
     const dispatch = useDispatch();
     const selectedBrewerie = useSelector(store => store.selectedBrewerie)
+    const wishlist = useSelector(store => store.wishlist)
+
 
     useEffect(() => {
         async function loadData() {
-            let request = await fetch(`http://192.168.43.159:3000/get-beers/${selectedBrewerie._id}/${token}`)
+            let request = await fetch(`http://192.168.1.42:3000/get-beers/${selectedBrewerie._id}/${token}`)
             let result = await request.json()
             setBeers(result.beers)
-            setWishlist(result.wishlist)
         }
         loadData()
     }, [])
+
+
+    const addToWishlist = async (beer, isInWishlist) => {
+        if(isInWishlist){
+            dispatch({type: 'addToWishList', beer: beer})
+        }else {
+            dispatch({type: 'removeFromWishlist', beer: beer})
+        }
+        await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+    }
 
     const moreInfoBeer = (beer) => {
         dispatch({ type: 'updateBeer', beerInfo: beer })
@@ -36,26 +47,10 @@ export default function BeerList({ navigation }) {
     }
 
 
-    const addToWishlist = async (beer, isInWishlist) => {
-        if(isInWishlist){
-            setWishlist([...wishlist, beer._id])
-        }else {
-            setWishlist(wishlist.filter(e => {e._id === beer._id}))
-        }
-        const request = await fetch(`http://192.168.43.159:3000/users/add-To-Wishlist/${beer._id}/${token}`)
-        const result = await request.json()
-        setWishlist(result.wishlist)
-    }
-
-
     const cards = beers.map((el, i) => {
         let isInWishlist = false;
-        wishlist.forEach(e => {
-            if(el._id === e._id){
-                isInWishlist = true
-            }
-        })
-        return <BeerCard key={i} isInWishlist={isInWishlist} indice={i} beer={el} addToWishlist={addToWishlist} />
+        wishlist.forEach(e => { if(el._id === e._id) isInWishlist = true })
+        return <BeerCard key={i} isInWishlist={isInWishlist} moreInfo={moreInfoBeer} indice={i} beer={el} addToWishlist={addToWishlist} />
     })
 
     return (

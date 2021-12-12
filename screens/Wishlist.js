@@ -1,41 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
-import { useSelector } from 'react-redux';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
-import IconI from 'react-native-vector-icons/AntDesign';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import BeerCard from './BeerCard';
-import { useIsFocused } from '@react-navigation/native';
 
 const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A'
+
 export default function Wishlist({ navigation }) {
 
     // const token = useSelector(store => store.token)
-    const [beers, setBeers] = useState([])
-    const isFocused = useIsFocused();
+    const dispatch = useDispatch()
+    const wishlist = useSelector(store => store.wishlist)
 
     if (token === '') {
         navigation.navigate('StackNav', { screen: 'Log' })
     }
 
-    useEffect(() => {
-        (async () => {
-            const request = await fetch(`http://192.168.43.159:3000/get-wishlist/${token}`)
-            const result = await request.json()
-            setBeers(result)
-        })()
-    }, [])
 
-    const moveFromWishlist = async (beer, isInWishlist) => {
-        setBeers(beers.filter(e => e._id !== beer._id))
-        const request = await fetch(`http://192.168.43.159:3000/users/add-To-Wishlist/${beer._id}/${token}`)
-        const result = await request.json()
+    const moveFromWishlist = async (beer) => {
+        dispatch({type: 'removeFromWishlist', beer: beer})
+        await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
     }
 
-    const cards = beers.map((el, i) => {
+    const moreInfoBeer = async (beer) => {
+        const request = await fetch(`http://192.168.1.42:3000/get-beer/${beer._id}`)
+        const result = await request.json()
+
+        dispatch({ type: 'updateBeer', beerInfo: result })
+        navigation.navigate('BeerInfo')
+    }
+
+    const cards = wishlist.map((el, i) => {
         let isInWishlist = true;
-        return <BeerCard key={i} isInWishlist={isInWishlist} indice={i} beer={el} addToWishlist={moveFromWishlist} />
-    })
+        return <BeerCard key={i} isInWishlist={isInWishlist} moreInfo={moreInfoBeer} indice={i} beer={el} addToWishlist={moveFromWishlist} />
+    })   
+
 
     return (
         <View style={{ backgroundColor: '#194454', flex: 1 }}>

@@ -36,7 +36,7 @@ export default function Log({navigation}) {
     var handleSubmitSignup = async () => {
 
         if(signUpPseudo !== '' || signUpEmail !== '' || signUpPassword !== ''){
-            const request = await fetch('http://192.168.43.159:3000/users/sign-up', {
+            const request = await fetch('http://192.168.1.42:3000/users/sign-up', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
@@ -71,7 +71,7 @@ export default function Log({navigation}) {
     let handleSubmitSignin = async () => {
 
         if(signInEmail !== '' || signInPassword !== ''){
-            const request = await fetch('http://192.168.43.159:3000/users/sign-in', {
+            const request = await fetch('http://192.168.1.42:3000/users/sign-in', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `email=${signInEmail}&password=${signInPassword}`

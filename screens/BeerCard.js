@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,7 +18,9 @@ export default function BeerCard(props) {
         return s()
     }
 
-    
+    const moreInfoBeer = (beer) => {
+        props.moreInfo(beer)
+    }
 
     return (
         <View style={styles.containerParent} >

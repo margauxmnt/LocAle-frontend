@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio} from 'native-base';
+import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
@@ -9,17 +9,19 @@ import { useIsFocused } from '@react-navigation/native';
 import MapView, { Marker } from 'react-native-maps'
 import * as Location from 'expo-location';
 
+const token = 'XAL39AFZCGMyhLD6Quw11nXJHggbrm4A';
+
 export default function Homepage({ navigation }) {
 
     //determine la location de l'utilisateur 
     const [location, setLocation] = useState({ coords: { latitude: 45.764043, longitude: 4.835659 } });
     //localisation de la map
     const [region, setRegion] = useState({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.1792,
-            longitudeDelta: 0.1191,
-        });
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.1792,
+        longitudeDelta: 0.1191,
+    });
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
     const dispatch = useDispatch();
@@ -37,25 +39,28 @@ export default function Homepage({ navigation }) {
     //demande l'autorisation de géolocaliser l'utilisateur à l'initialisation du composant
     useEffect(() => {
         async function askPermission() {
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status == 'granted') {
-            // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
-            await Location.watchPositionAsync({distanceInterval: 10}, 
-            (location) => { setLocation(location)});
-            dispatch({type: 'userLocalisation', location});
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status == 'granted') {
+                // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
+                await Location.watchPositionAsync({ distanceInterval: 10 },
+                    (location) => { setLocation(location) });
+                dispatch({ type: 'userLocalisation', location });
             }
         } askPermission();
 
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries() {
             //attention ADRESSE IP à changer en fonction
-            let rawResponse = await fetch(`http://192.168.43.159:3000/get-breweries?position=${JSON.stringify(location)}&token=${15115}`);
-            var response = await rawResponse.json();
+            const rawResponse = await fetch(`http://192.168.1.42:3000/get-breweries?position=${JSON.stringify(location)}&token=${token}`);
+            const response = await rawResponse.json();
             if (response) {
                 setBreweries(response.breweries);
                 dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
+
+                // si l'utilisateur est connecté
+                if (response.user) dispatch({ type: 'updateWishlist', wishlist: response.user.wishlist })
             };
-        }; 
+        };
         searchBreweries();
     }, []);
 
@@ -63,9 +68,9 @@ export default function Homepage({ navigation }) {
     // quand on redirige d'une page vers la homepage, si il y a une brasserie à afficher on ouvre la modale avec la brasserie
     // et si il n'y a rien dans le store, on ferme la modale et on ne met aucune infos sélectionée
     useEffect(() => {
-        if(selectedBrewerieRedux.length !== 0 && isFocused){
+        if (selectedBrewerieRedux.length !== 0 && isFocused) {
             selectBrewerie(selectedBrewerieRedux)
-        }else {
+        } else {
             setSelectedBrewerie({})
             onClose();
         }
@@ -90,7 +95,7 @@ export default function Homepage({ navigation }) {
     let localBreweriesMarkers = breweries.map(function (breweries, i) {
         return <Marker
             key={i}
-            onPress={()=> selectBrewerie(breweries.brewerie)}
+            onPress={() => selectBrewerie(breweries.brewerie)}
             coordinate={{ latitude: breweries.brewerie.latitude, longitude: breweries.brewerie.longitude }}>
             <Icon name='map-marker' size={35} color={'#194454'} />
         </Marker>
@@ -98,7 +103,7 @@ export default function Homepage({ navigation }) {
 
     //création de la liste des brasseries
     let localBreweriesList = breweries.map(function (breweries, i) {
-        return <Pressable key={i} onPress={()=> selectBrewerie(breweries.brewerie)}>
+        return <Pressable key={i} onPress={() => selectBrewerie(breweries.brewerie)}>
             <Box
                 rounded="lg"
                 borderColor="#194454"
@@ -126,7 +131,7 @@ export default function Homepage({ navigation }) {
 
             <View style={{ flex: 1 }}>
 
-            <MapView
+                <MapView
                     provider={MapView.PROVIDER_GOOGLE}
                     style={styles.container}
                     region={region}>
@@ -157,8 +162,8 @@ export default function Homepage({ navigation }) {
                     </ScrollView>
                 </View>
 
-                <Actionsheet 
-                    isOpen={isOpen} 
+                <Actionsheet
+                    isOpen={isOpen}
                     onClose={() => {
                         onClose();
                         setRegion({
@@ -166,7 +171,8 @@ export default function Homepage({ navigation }) {
                             longitude: location.coords.longitude,
                             latitudeDelta: 0.1792,
                             longitudeDelta: 0.1191,
-                        })} }
+                        })
+                    }}
                     hideDragIndicator>
                     <Actionsheet.Content borderTopRadius="0" padding={0}>
                         <Box w="100%" h={350} alignItems='center'>
@@ -193,12 +199,12 @@ export default function Homepage({ navigation }) {
                             <Text style={styles.beweriesDesc} >
                                 {selectedBrewerie.description}
                             </Text>
-                            <Button 
+                            <Button
                                 onPress={() => {
-                                    dispatch({type: 'selectedBrewerie', brewery: selectedBrewerie}); 
+                                    dispatch({ type: 'selectedBrewerie', brewery: selectedBrewerie });
                                     navigation.navigate('BeerList')
                                 }}
-                                style={styles.beerButton} 
+                                style={styles.beerButton}
                                 size="lg">
                                 Découvrir nos bières
                             </Button>
@@ -279,8 +285,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         backgroundColor: '#ffffff99',
-        borderStyle:'solid',
-        borderColor:'#8395a7',
+        borderStyle: 'solid',
+        borderColor: '#8395a7',
         borderWidth: 2,
         width: '100%',
         color: '#8395a7'
