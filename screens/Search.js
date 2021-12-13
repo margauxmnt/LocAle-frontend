@@ -16,11 +16,7 @@ function TypeaheadUsingComponentWithRenderItem(props) {
 
     useEffect(() => {
         (async () => {
-<<<<<<< HEAD
             const request = await fetch(`http://${IPADRESS}:3000/get-beers-n-notes`)
-=======
-            const request = await fetch('http://172.16.190.147:3000/get-beers-n-notes')
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
             const result = await request.json();
             result.forEach(el => el.note !== undefined ? el.icon = require('../assets/beer.png') : el.icon = require('../assets/brewery.png'))
             setData(result)
@@ -38,21 +34,13 @@ function TypeaheadUsingComponentWithRenderItem(props) {
     const selectSearch = async (item) => {
         if (item !== null) {
             if (data[item].note !== undefined) {
-<<<<<<< HEAD
                 const request = await fetch(`http://${IPADRESS}:3000/get-beer/${data[item].id}`)
-=======
-                const request = await fetch(`http://172.16.190.147:3000/get-beer/${data[item].id}`)
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
                 const result = await request.json()
                 dispatch({ type: 'updateBeer', beerInfo: result })
                 setFilterText('')
                 props.navigation.navigate('StackNav', { screen: 'BeerInfo' })
             } else {
-<<<<<<< HEAD
                 const request = await fetch(`http://${IPADRESS}:3000/get-brewery/${data[item].id}`);
-=======
-                const request = await fetch(`http://172.16.190.147:3000/get-brewery/${data[item].id}`);
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
                 const result = await request.json()
                 dispatch({ type: 'selectedBrewerie', brewery: result })
                 setFilterText('')

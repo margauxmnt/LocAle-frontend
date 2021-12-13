@@ -29,6 +29,7 @@ export default function Profile({ navigation }) {
                 let rawResponse = await fetch(`http://${IPADRESS}:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
                 setUser(response.user)
+                dispatch({type: 'updateNotes', userNotes: response.userNotes})
             }; getUserInfos();
 
             async function getPermission() {
@@ -51,7 +52,7 @@ export default function Profile({ navigation }) {
     }
 
     const editPseudo = async () => {
-        const rawResponse = await fetch('http://172.16.190.147:3000/users/edit-pseudo', {
+        const rawResponse = await fetch(`http://${IPADRESS}:3000/users/edit-pseudo`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `pseudo=${newPseudo}&token=${token}`
@@ -60,15 +61,20 @@ export default function Profile({ navigation }) {
     }
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
+        const image = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
         });
-        if (!result.cancelled) {
-            AsyncStorage.setItem('userAvatar', (result.uri));
-            dispatch({ type: 'addAvatar', avatar: result.uri })
+        if (!image.cancelled) {
+            const request = await fetch(`http://${IPADRESS}:3000/users/update-picture`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `avatar=${image.uri}&token=${token}`
+            })
+            const result = await request.json()
+            console.log(result)
         }
     };
 
@@ -88,38 +94,40 @@ export default function Profile({ navigation }) {
 
 
     let Notes = [];
-    if (userNotes.length === 0)
+    if (userNotes.length === 0){
         Notes.push(
             <View style={styles.card}>
                 <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
             </View>
         )
-    else Notes = userNotes.map(function (el, i) {
-        return (
-            <TouchableOpacity key={i} onPress={() => moreInfoBeer(el.beer)} style={styles.card}>
-                <View>
-                    <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
-                </View>
-                <View style={{ marginLeft: 10, width: '75%' }}>
-                    <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
-                    <View style={{ alignItems: 'center' }}>
-                        <View style={styles.starContainer}>
-                            {starByNote(() => {
-                                let stars = [];
-                                for (let i = 0; i < 5; i++) {
-                                    if (el.note > i) {
-                                        stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FAE16C" />)
-                                    } else stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FEF5CB" />)
-                                }
-                                return stars
-                            })}
-                        </View>
-                        <Text style={{ color: '#194454', fontWeight: 'bold' }}>{el.comment}</Text>
+    } else {
+        Notes = userNotes.map(function (el, i) {
+            return (
+                <TouchableOpacity key={i} onPress={() => moreInfoBeer(el.beer)} style={styles.card}>
+                    <View>
+                        <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
                     </View>
-                </View>
-            </TouchableOpacity>
-        )
-    })
+                    <View style={{ marginLeft: 10, width: '75%' }}>
+                        <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                        <View style={{ alignItems: 'center' }}>
+                            <View style={styles.starContainer}>
+                                {starByNote(() => {
+                                    let stars = [];
+                                    for (let i = 0; i < 5; i++) {
+                                        if (el.note > i) {
+                                            stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FAE16C" />)
+                                        } else stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FEF5CB" />)
+                                    }
+                                    return stars
+                                })}
+                            </View>
+                            <Text style={{ color: '#194454', fontWeight: 'bold' }}>{el.comment}</Text>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            )
+        })        
+    } 
 
 
     return (
@@ -138,7 +146,7 @@ export default function Profile({ navigation }) {
                     <View style={{ flexDirection: 'row' }}>
                         <Avatar
                             size="xl"
-                                source={require('../assets/logo_matth_transparent.png')}
+                                source={user.avatar !== 'default' ? user.avatar : require('../assets/logo_matth_transparent.png') }
                         />
                         <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                     </View>

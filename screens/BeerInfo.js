@@ -26,11 +26,7 @@ export default function BeerInfo({ navigation }) {
 
     useEffect(() => {
         const getSellers = async () => {
-<<<<<<< HEAD
             const request = await fetch(`http://${IPADRESS}:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
-=======
-            const request = await fetch(`http://172.16.190.147:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
             const result = await request.json()
             setSellers(result.sellers)
         }
@@ -124,11 +120,7 @@ export default function BeerInfo({ navigation }) {
 
 
     const goBack = async () => {
-<<<<<<< HEAD
         const request = await fetch(`http://${IPADRESS}:3000/get-brewery-from-beer/${beerInfo._id}`)
-=======
-        const request = await fetch(`http://172.16.190.147:3000/get-brewery-from-beer/${beerInfo._id}`)
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
         const result = await request.json()
         dispatch({ type: 'selectedBrewerie', brewery: result })
         navigation.navigate('BeerList')
@@ -137,11 +129,7 @@ export default function BeerInfo({ navigation }) {
 
     const addNote = async () => {
         if(token !== ''){
-<<<<<<< HEAD
             const request = await fetch(`http://${IPADRESS}:3000/users/add-note`, {
-=======
-            const request = await fetch('http://172.16.190.147:3000/users/add-note', {
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
@@ -165,11 +153,7 @@ export default function BeerInfo({ navigation }) {
                 dispatch({type: 'removeFromWishlist', beer: beer})
                 setLike(false);
             }
-<<<<<<< HEAD
             await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
-=======
-            await fetch(`http://172.16.190.147:3000/users/add-To-Wishlist/${beer._id}/${token}`)
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
         }else{
             navigation.navigate('StackNav', {screen: 'Log'})
         }

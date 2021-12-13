@@ -19,6 +19,8 @@
     "@react-navigation/native-stack": "^6.2.5",
     "expo": "~43.0.2",
     "expo-font": "^10.0.3",
+    "expo-google-app-auth": "^9.0.0",
+    "expo-image-picker": "~11.0.3",
     "expo-linking": "~2.4.2",
     "expo-location": "^13.0.4",
     "expo-status-bar": "~1.1.0",
@@ -37,13 +39,7 @@
     "react-native-vector-icons": "^9.0.0",
     "react-native-web": "0.17.1",
     "react-redux": "^7.2.6",
-    "redux": "^4.1.2",
-<<<<<<< HEAD
-    "expo-google-app-auth": "~9.0.0",
-    "expo-google-sign-in": "~10.0.3"
-=======
-    "expo-image-picker": "~11.0.3"
->>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
+    "redux": "^4.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

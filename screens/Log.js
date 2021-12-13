@@ -42,7 +42,7 @@ export default function Log({ navigation }) {
             const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
+                body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}&avatar=default`
             })
             const result = await request.json()
 
@@ -129,7 +129,7 @@ export default function Log({ navigation }) {
                 const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `pseudo=${res.user.givenName}&email=${res.user.email}&password=12DH5K6M8L`
+                    body: `pseudo=${res.user.givenName}&email=${res.user.email}&password=12DH5K6M8L&avatar=${res.user.photoUrl}`
                 })
                 const result = await request.json()
 
