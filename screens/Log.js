@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet, Image, Button } from 'react-native'
 import { Input, NativeBaseProvider } from "native-base"
 import { useDispatch } from 'react-redux';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Log({navigation}) {
@@ -36,7 +35,7 @@ export default function Log({navigation}) {
     var handleSubmitSignup = async () => {
 
         if(signUpPseudo !== '' || signUpEmail !== '' || signUpPassword !== ''){
-            const request = await fetch('http://172.16.190.135:3000/users/sign-up', {
+            const request = await fetch('http://172.16.190.147:3000/users/sign-up', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
@@ -44,6 +43,8 @@ export default function Log({navigation}) {
             const result = await request.json()
     
             if(result.error === ''){
+                AsyncStorage.setItem('userEmail', signUpEmail)
+                AsyncStorage.setItem('userPassword', signUpPassword)
                 dispatch({type: 'addToken', token: result.token})
                 navigation.navigate('Profile')
             }else if(result.error === 'Vous avez déjà un compte.') {
@@ -71,7 +72,7 @@ export default function Log({navigation}) {
     let handleSubmitSignin = async () => {
 
         if(signInEmail !== '' || signInPassword !== ''){
-            const request = await fetch('http://172.16.190.135:3000/users/sign-in', {
+            const request = await fetch('http://172.16.190.147:3000/users/sign-in', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `email=${signInEmail}&password=${signInPassword}`
@@ -79,7 +80,18 @@ export default function Log({navigation}) {
             const result = await request.json()
     
             if(result.error === ''){
+                // on vérifie si c'est un nouvel appareil et si il y a quelque chose dans le cache
+                // s'il n'y a rien on ajoute dans le cache
+                // si ce n'est pas un nouvel appareil et que qu'il y a quelque chose, on l'ajoute seulement si 
+                //    les identifiant de connexion sont différent
+                AsyncStorage.getItem('userEmail', (err, data) => {
+                    if(data !== signInEmail || data === null) {
+                        AsyncStorage.setItem('userEmail', signInEmail)     
+                        AsyncStorage.setItem('userPassword', signInPassword)
+                    }     
+                })
                 dispatch({type: 'addToken', token: result.token})
+                dispatch({type: 'updateWishlist', wishlist: result.wishlist})
                 navigation.navigate('Profile')
             }else if(result.error === 'Mot de passe incorrect.'){
                 setSignInPassword('')
