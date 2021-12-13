@@ -33,29 +33,29 @@ export default function Profile({ navigation }) {
         return <View></View>
     } else {
         if (token) {
-            let userNotes = user[0].notes.map(function (el, i){
+            let userNotes = user[0].notes.map(function (el, i) {
                 return <View key={i} style={styles.card}>
-                <View>
-                    <Image style={styles.beerImage} source={{uri: el.beer.picture}} alt='Image' />
-                </View>
-                <View style={{ marginLeft: 10, width: '75%' }}>
-                    <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
-                    <View style={{ alignItems: 'center' }}>
-                        <View style={styles.starContainer}>
-                            {starByNote(() => {
-                                let stars = [];
-                                for (let i = 0; i < 5; i++) {
-                                    if (el.note > i) {
-                                        stars.push(<Icon style={styles.star} name="star" size={27} color="#FAE16C" />)
-                                    } else stars.push(<Icon style={styles.star} name="star" size={27} color="#FEF5CB" />)
-                                }
-                                return stars
-                            })}
+                    <View>
+                        <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
+                    </View>
+                    <View style={{ marginLeft: 10, width: '75%' }}>
+                        <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                        <View style={{ alignItems: 'center' }}>
+                            <View style={styles.starContainer}>
+                                {starByNote(() => {
+                                    let stars = [];
+                                    for (let i = 0; i < 5; i++) {
+                                        if (el.note > i) {
+                                            stars.push(<Icon style={styles.star} name="star" size={27} color="#FAE16C" />)
+                                        } else stars.push(<Icon style={styles.star} name="star" size={27} color="#FEF5CB" />)
+                                    }
+                                    return stars
+                                })}
+                            </View>
+                            <Text style={{ color: '#194454', fontWeight: 'bold' }}>{el.comment}</Text>
                         </View>
-                        <Text style={{ color: '#194454', fontWeight: 'bold' }}>{el.comment}</Text>
                     </View>
                 </View>
-            </View>
             })
 
             return (
