@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, Button } from 'react-native'
-import { Input } from 'react-native-elements'
+import { Input, NativeBaseProvider } from "native-base"
+import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 /*Import pour la connexion FB*/
 import * as Facebook from 'expo-facebook';
 
@@ -9,20 +11,19 @@ import * as Facebook from 'expo-facebook';
 
 
 
+export default function Log({navigation}) {
 
-export default function Log(props) {
+    const dispatch = useDispatch()
 
     /*Log*/
     const [display, setDisplay] = useState('flex')
     const [displayTwo, setDisplayTwo] = useState('flex')
 
     const toogle = () => {
-        console.log('clic1')
         display === 'flex' ? setDisplay('none') : setDisplay('flex')
     }
 
     const toogleTwo = () => {
-        console.log('clic2')
         displayTwo === 'flex' ? setDisplayTwo('none') : setDisplayTwo('flex')
     }
 
@@ -34,27 +35,37 @@ export default function Log(props) {
     const [signUpEmail, setSignUpEmail] = useState('')
     const [signUpPassword, setSignUpPassword] = useState('')
 
-    const [listErrorsSignup, setErrorsSignup] = useState([])
+    const [errorSignup, setErrorSignup] = useState('')
 
 
     var handleSubmitSignup = async () => {
 
-
-        const data = await fetch('http://192.168.1.111:3000/users/sign-up', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
-        })
-
-        const body = await data.json()
-
-        if (body.result == true) {
-            props.addToken(body.token)
-            setUserExists(true)
-
-        } else {
-            setErrorsSignup(body.error)
-        }
+        if(signUpPseudo !== '' || signUpEmail !== '' || signUpPassword !== ''){
+            const request = await fetch('http://192.168.1.42:3000/users/sign-up', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
+            })
+            const result = await request.json()
+    
+            if(result.error === ''){
+                AsyncStorage.setItem('userEmail', signUpEmail)
+                AsyncStorage.setItem('userPassword', signUpPassword)
+                dispatch({type: 'addToken', token: result.token})
+                navigation.navigate('Profile')
+            }else if(result.error === 'Vous avez déjà un compte.') {
+                setErrorSignin(result.error)
+                setSignInEmail(signUpEmail)
+                setSignUpEmail('')
+                setSignUpPassword('')
+                setSignUpPseudo('')
+                toogleTwo()
+            }else {
+                setErrorSignup(result.error)
+                setSignUpPseudo('')
+            }
+    
+        }else setErrorSignup('Un des champs est manquant !')
     }
 
     /*Connexion Facebook*/
@@ -63,36 +74,53 @@ export default function Log(props) {
     const [signInEmail, setSignInEmail] = useState('')
     const [signInPassword, setSignInPassword] = useState('')
 
-    const [listErrorsSignin, setErrorsSignin] = useState([])
+    const [errorSignin, setErrorSignin] = useState('')
 
 
     let handleSubmitSignin = async () => {
 
-        const data = await fetch('http://192.168.1.111:3000/users/sign-in', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `email=${signInEmail}&password=${signInPassword}`
-        })
-
-        const body = await data.json()
-
-        if (body.result == true) {
-            props.addToken(body.token)
-            setUserExists(true)
-
-        } else {
-            setErrorsSignin(body.error)
-        }
+        if(signInEmail !== '' || signInPassword !== ''){
+            const request = await fetch('http://192.168.1.42:3000/users/sign-in', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `email=${signInEmail}&password=${signInPassword}`
+            })
+            const result = await request.json()
+    
+            if(result.error === ''){
+                // on vérifie si c'est un nouvel appareil et si il y a quelque chose dans le cache
+                // s'il n'y a rien on ajoute dans le cache
+                // si ce n'est pas un nouvel appareil et que qu'il y a quelque chose, on l'ajoute seulement si 
+                //    les identifiant de connexion sont différent
+                AsyncStorage.getItem('userEmail', (err, data) => {
+                    if(data !== signInEmail || data === null) {
+                        AsyncStorage.setItem('userEmail', signInEmail)     
+                        AsyncStorage.setItem('userPassword', signInPassword)
+                    }     
+                })
+                dispatch({type: 'addToken', token: result.token})
+                dispatch({type: 'updateWishlist', wishlist: result.wishlist})
+                navigation.navigate('Profile')
+            }else if(result.error === 'Mot de passe incorrect.'){
+                setSignInPassword('')
+                setErrorSignin(result.error)
+            }else if(result.error === 'Pas de compte avec cette adresse.'){
+                setErrorSignin('')
+                setErrorSignup(result.error)
+                setSignUpEmail(signInEmail)
+                setSignInPassword('')
+                setSignInEmail('')
+                setSignUpPassword('')
+                setSignUpPseudo('')
+                toogleTwo()
+            }
+        }else setErrorSignin('Un des champs est manquant !')        
     }
-
-    let tabErrorsSignin = listErrorsSignin.map((error, i) => {
-        return (<Text>{error}</Text>)
-    })
 
 
 
     return (
-        <>
+        <NativeBaseProvider style={{flex: 1}}>
 
             <View style={{ display: display, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
 
@@ -100,11 +128,10 @@ export default function Log(props) {
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
-
                 <View>
 
                     <View style={styles.backgroundTexte}>
-                        <Button onPress={() => toogle()} style={styles.email} color="#fff" title="Adresse mail"></Button>
+                        <Button onPress={() => toogle()} style={styles.email} color="#194454" title="Adresse mail"></Button>
                     </View>
 
                     <View style={styles.authButtonView}>
@@ -124,67 +151,67 @@ export default function Log(props) {
             </View>
 
 
-
+            {/* SIGN UP */}
             <View style={{ display: displayTwo, height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
 
                 <View>
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
+                <Text style={{color: '#e63946'}}>{errorSignup}</Text>
 
                 <View>
 
                     <View style={styles.backgroundColorInput}>
-                        <Input style={styles.input} onChangeText={(value) => setSignUpPseudo(value)} value={signUpPseudo} placeholder='Pseudo'></Input>
-                        <Input style={styles.input} onChangeText={(value) => setSignUpEmail(value)} value={signUpEmail} placeholder='Email'></Input>
-                        <Input style={styles.input} onChangeText={(value) => setSignUpPassword(value)} value={signUpPassword} placeholder='Mot de passe'></Input>
+                        <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignUpPseudo(value)} value={signUpPseudo} placeholder='Pseudo'></Input>
+                        <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignUpEmail(value)} value={signUpEmail} placeholder='Email'></Input>
+                        <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignUpPassword(value)} value={signUpPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
                     </View>
-
-
 
                     <View style={styles.button}>
-                        <Button color="#fff" title="Valider" onPress={() => handleSubmitSignup()}></Button>
+                        <Button title="Valider" color="#194454" onPress={() => handleSubmitSignup()}></Button>
                     </View>
 
-                    <View style={styles.compte}>
-                        <Button color="#fff" title='Déjà un compte ?' textAlign='left' onPress={() => toogleTwo()}></Button>
-                    </View>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                        <Text onPress={() => toogleTwo()} style={styles.text}>Déjà un compte ?</Text>
+                        <Text onPress={() => toogle()} style={styles.text}>Se connecter autrement.</Text>
+                    </View>                    
 
                 </View>
 
             </View>
 
 
-
+            {/* SIGN IN */}
             <View style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
 
                 <View>
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
+                <Text style={{color: '#e63946'}}>{errorSignin}</Text>
 
                 <View style={styles.containerButton}>
 
                     <View>
+
                         <View style={styles.backgroundColorInput}>
-                            <Input style={styles.input} onChangeText={(value) => setSignInEmail(value)} value={signInEmail} placeholder='Email'></Input>
-                            <Input style={styles.input} onChangeText={(value) => setSignInPassword(value)} value={signInPassword} placeholder='Mot de passe'></Input>
+                            <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignInEmail(value)} value={signInEmail} placeholder='Email'></Input>
+                            <Input style={styles.input} variant="underlined" onChangeText={(value) => setSignInPassword(value)} value={signInPassword} secureTextEntry={true} placeholder='Mot de passe'></Input>
                         </View>
-
-
 
                         <View style={styles.button}>
-                            <Button color="#fff" title="Valider" onPress={() => handleSubmitSignin()}></Button>
+                            <Button title="Valider" color="#194454" onPress={() => handleSubmitSignin()}></Button>
                         </View>
 
+                        <Text onPress={() => toogleTwo()} style={styles.text}>Pas encore de compte ?</Text>
 
                     </View>
 
                 </View>
 
             </View>
-
-        </>
+        </NativeBaseProvider>
     )
 
 }
@@ -239,6 +266,10 @@ const styles = StyleSheet.create({
     texteCompte: {
         color: 'white',
         fontSize: 15,
+    },
+    text: {
+        color: 'lightblue',
+        margin: 10,
     }
 
 })
