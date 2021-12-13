@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { NativeBaseProvider, Avatar, Button, ScrollView, Image } from 'native-base';
+import { NativeBaseProvider, Avatar, Button, ScrollView, Image, Center, Modal, FormControl, Input } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
+import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Profile({ navigation }) {
 
+    const dispatch = useDispatch()
     //récupération du token dans le store
     const token = useSelector(store => store.token)
-    const dispatch = useDispatch()
-    //variable contenant les infos de l'utilisateur
-    const [user, setUser] = useState({});
-
+    //variables contenant les infos de l'utilisateur
+    const [user, setUser] = useState({})
+    // const [image, setImage] = useState(null)
+    const avatar = useSelector(store => store.avatar)
+    //ouverture modale pour editer le pseudo
+    const [showModal, setShowModal] = useState(false)
+    const [newPseudo, setNewPseudo] = useState('');
 
     useEffect(() => {
         if (token === '') {
@@ -26,8 +31,26 @@ export default function Profile({ navigation }) {
                 let response = await rawResponse.json();
                 setUser(response.user)
             }; getUserInfos();
+
+            async function getPermission() {
+                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                if (status !== 'granted') {
+                    alert('Sorry, we need camera roll permissions to make this work!');
+                }
+            }; getPermission();
+
+            AsyncStorage.getItem('userAvatar', (err, data) => {
+                dispatch({ type: 'addAvatar', avatar: data })   
+            })
         }
     }, [token]);
+
+    console.log(avatar);
+    // useEffect(() => {
+    //     AsyncStorage.getItem('userAvatar', (err, data) => {
+    //         setImage(data);
+    //     })
+    // }, [avatar])
 
 
     const moreInfoBeer = async (beer) => {
@@ -38,6 +61,27 @@ export default function Profile({ navigation }) {
         navigation.navigate('StackNav', {screen: 'BeerInfo'})
     }
 
+    const editPseudo = async () => {
+        const rawResponse = await fetch('http://172.16.190.147:3000/users/edit-pseudo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `pseudo=${newPseudo}&token=${token}`
+        })
+        await rawResponse.json()
+    }
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+          });
+          if (!result.cancelled) {
+            AsyncStorage.setItem('userAvatar', (result.uri));
+            dispatch({ type: 'addAvatar', avatar: result.uri })
+          }
+        };
 
     const logout = () => {
         //non fonctionnel, redirige vers la home puis vers le login et ne remet pas à jour le profil
@@ -48,16 +92,22 @@ export default function Profile({ navigation }) {
         // AsyncStorage.removeItem('userPassword');
     }
 
-
     // --- stars by note --- //
     const starByNote = (s) => {
         return s();
     }
 
+
     if (user.notes == undefined) {
         return <View />
     } else {
-        let userNotes = user.notes.map(function (el, i) {
+        let userNotes = [];
+        if (user.notes.length === 0) userNotes.push(
+            <View style={styles.card}>
+                <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
+            </View>
+        )
+        else userNotes = user.notes.map(function (el, i) {
             return (
                 <TouchableOpacity key={i} onPress={() => moreInfoBeer(el.beer)} style={styles.card}>
                     <View>
@@ -71,8 +121,8 @@ export default function Profile({ navigation }) {
                                     let stars = [];
                                     for (let i = 0; i < 5; i++) {
                                         if (el.note > i) {
-                                            stars.push(<Icon style={styles.star} name="star" size={27} color="#FAE16C" />)
-                                        } else stars.push(<Icon style={styles.star} name="star" size={27} color="#FEF5CB" />)
+                                            stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FAE16C" />)
+                                        } else stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FEF5CB" />)
                                     }
                                     return stars
                                 })}
@@ -101,15 +151,15 @@ export default function Profile({ navigation }) {
                         <View style={{ flexDirection: 'row' }}>
                             <Avatar
                                 size="xl"
-                                source={require('../assets/logo_matth_transparent.png')}
+                                source={avatar !== '' ? {uri: avatar} : require('../assets/logo_matth_transparent.png')}
                             />
-                            <Icon name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
+                            <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                         </View>
 
                         <View style={styles.userInfos}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={{ color: '#194454', fontSize: 20 }}>{user.pseudo}</Text>
-                                <Icon name="edit" size={15} style={styles.editIcon} />
+                                <Text style={{ color: '#194454', fontSize: 20 }}>{newPseudo !== '' ? newPseudo : user.pseudo}</Text>
+                                <Icon onPress={() => setShowModal(true)} name="edit" size={15} style={styles.editIcon} />
                             </View>
 
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -139,16 +189,37 @@ export default function Profile({ navigation }) {
                         <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
                     </View>
 
-                    {/** si pas de commentaires laissés  */}
-
-                    {/* <View style={styles.card}>
-                            <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
-                        </View> */}
-
-                    {/** si il y a des commentaires laissés pas l'utilisateur  */}
                     <ScrollView>
                         {userNotes}
                     </ScrollView>
+
+                    <Center flex={1}>
+                    <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                        <Modal.Content maxWidth="400px">
+                            <Modal.CloseButton />
+                            <Modal.Header>Modifie tes informations de profil</Modal.Header>
+                            <Modal.Body>
+                                <FormControl>
+                                    <FormControl.Label>Nouveau pseudo</FormControl.Label>
+                                    <Input onChangeText={(v) => setNewPseudo(v)} />
+                                </FormControl>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button.Group space={2}>
+                                    <Button
+                                        style={styles.modalButton}
+                                        onPress={() => {
+                                            editPseudo();
+                                            setShowModal(false)
+                                        }}
+                                    >
+                                        Valider
+                                    </Button>
+                                </Button.Group>
+                            </Modal.Footer>
+                        </Modal.Content>
+                    </Modal>
+                </Center>
 
                 </View >
 
@@ -235,4 +306,8 @@ const styles = StyleSheet.create({
     star: {
         marginRight: 5,
     },
+    modalButton: {
+        backgroundColor: '#194454',
+        margin: 'auto',
+    }
 })

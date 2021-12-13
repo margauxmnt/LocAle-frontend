@@ -7,19 +7,13 @@ import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
 import { Button, Modal, FormControl, Input, Center, NativeBaseProvider } from "native-base"
 
-const currentPosition = {
-    latitude: 45.763420,
-    longitude: 4.834277,
-}
-
-
 export default function BeerInfo({ navigation }) {
 
     const beerInfo = useSelector(store => store.beerInfo)
     const wishlist = useSelector(store => store.wishlist)
     const token = useSelector(store => store.token)
     const dispatch = useDispatch()
-    // const currentPosition = useSelector(store => store.initialPosition)
+    const currentPosition = useSelector(store => store.location)
 
     const [sellers, setSellers] = useState([]);
     const [region, setRegion] = useState(currentPosition)
@@ -125,7 +119,7 @@ export default function BeerInfo({ navigation }) {
 
 
     const goBack = async () => {
-        const request = await fetch(`http://192.168.1.42:3000/get-brewery-from-beer/${beerInfo._id}`)
+        const request = await fetch(`http://172.16.190.147:3000/get-brewery-from-beer/${beerInfo._id}`)
         const result = await request.json()
         dispatch({ type: 'selectedBrewerie', brewery: result })
         navigation.navigate('BeerList')
@@ -204,14 +198,14 @@ export default function BeerInfo({ navigation }) {
                     <MapView
                         style={{ width: '100%', height: 200 }}
                         region={{
-                            latitude: region.latitude,
-                            longitude: region.longitude,
+                            latitude: region.coords.latitude,
+                            longitude: region.coords.longitude,
                             latitudeDelta: 0.04,
                             longitudeDelta: 0.0421,
                         }}
                     >
                         {markers}
-                        <MapView.Marker coordinate={currentPosition} >
+                        <MapView.Marker coordinate={region.coords} >
                             <View style={{ height: 15, width: 15, backgroundColor: '#737CD3', borderRadius: 50, borderWidth: 3, borderColor: "#FCFCFC" }} />
                         </MapView.Marker>
                     </MapView>
@@ -368,7 +362,7 @@ const styles = StyleSheet.create({
     },
     card: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
+        borderTopWidth: 1,
         borderColor: '#194454',
         padding: 5,
     },

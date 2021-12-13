@@ -52,8 +52,8 @@ export default function BeerCard(props) {
                         let stars = [];
                         for (let i = 0; i < 5; i++) {
                             if (globalNote > i) {
-                                stars.push(<Icon style={{ marginRight: 2 }} name="star" size={25} color="#FAE16C" />)
-                            } else stars.push(<Icon style={{ marginRight: 2 }} name="star" size={25} color="#FEF5CB" />)
+                                stars.push(<Icon key={i} style={{ marginRight: 2 }} name="star" size={25} color="#FAE16C" />)
+                            } else stars.push(<Icon key={i} style={{ marginRight: 2 }} name="star" size={25} color="#FEF5CB" />)
                         }
                         return stars
                     })}

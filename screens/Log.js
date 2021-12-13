@@ -123,7 +123,7 @@ export default function Log({navigation}) {
                 <View>
 
                     <View style={styles.backgroundTexte}>
-                        <Button onPress={() => toogle()} style={styles.email} color="#194454" title="Adresse mail"></Button>
+                        <Button onPress={() => toogle()} style={styles.email} color="#fff" title="Adresse mail"></Button>
                     </View>
 
                     <View style={styles.backgroundTexte}>
@@ -157,7 +157,7 @@ export default function Log({navigation}) {
                     </View>
 
                     <View style={styles.button}>
-                        <Button title="Valider" color="#194454" onPress={() => handleSubmitSignup()}></Button>
+                        <Button title="Valider" color="#fff" onPress={() => handleSubmitSignup()}></Button>
                     </View>
 
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -189,7 +189,7 @@ export default function Log({navigation}) {
                         </View>
 
                         <View style={styles.button}>
-                            <Button title="Valider" color="#194454" onPress={() => handleSubmitSignin()}></Button>
+                            <Button title="Valider" color="#fff" onPress={() => handleSubmitSignin()}></Button>
                         </View>
 
                         <Text onPress={() => toogleTwo()} style={styles.text}>Pas encore de compte ?</Text>
