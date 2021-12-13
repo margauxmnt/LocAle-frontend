@@ -19,7 +19,7 @@ export default function BeerList({ navigation }) {
 
     useEffect(() => {
         async function loadData() {
-            let request = await fetch(`http://172.16.191.137:3000/get-beers/${selectedBrewerie._id}`)
+            let request = await fetch(`http://192.168.1.111:3000/get-beers/${selectedBrewerie._id}`)
             let result = await request.json()
             setBeers(result)
         }

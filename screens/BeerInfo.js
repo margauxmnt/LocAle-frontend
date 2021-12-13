@@ -46,7 +46,7 @@ export default function BeerInfo({navigation}) {
 
     useEffect(() => {
         const getSellers = async () => {
-            const request = await fetch(`http://172.16.191.137:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
+            const request = await fetch(`http://192.168.1.111:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
             const result = await request.json()
             setSellers(result.sellers)
         }

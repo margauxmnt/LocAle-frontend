@@ -22,6 +22,7 @@ import Search from './screens/Search';
 import Profile from './screens/Profile';
 import BeerList from './screens/BeerList';
 import BeerInfo from './screens/BeerInfo';
+import Log from './screens/Log'
 
 
 
@@ -30,7 +31,6 @@ import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import breweries from './reducers/breweries.reducer';
 import beerInfo from './reducers/beerInfo.reducer';
-import SignIn from './screens/SignIn';
 import location from './reducers/location.reducer';
 import selectedBrewerie from "./reducers/selectedBrewerie.reducer";
 
@@ -84,7 +84,7 @@ export default function App() {
             <Tab.Screen name="Homepage" component={StackNavigator} />
             <Tab.Screen name="Search" component={Search} />
             <Tab.Screen name="Wishlist" component={Wishlist} />
-            <Tab.Screen name="Profile" component={Profile} />
+            <Tab.Screen name="Profile" component={Log} />
           </Tab.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>

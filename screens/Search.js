@@ -15,7 +15,7 @@ function TypeaheadUsingComponentWithRenderItem(props) {
 
     useEffect(() => {
         (async () => {
-            const request = await fetch('http://172.16.191.137:3000/get-beers-n-notes')
+            const request = await fetch('http://192.168.1.111:3000/get-beers-n-notes')
             const result = await request.json();
             result.forEach(el => el.note !== undefined ? el.icon = require('../assets/beer.png') : el.icon = require('../assets/brewery.png'))
             setData(result)
@@ -33,14 +33,14 @@ function TypeaheadUsingComponentWithRenderItem(props) {
     const selectSearch = (item) => {
         if (data[item].note !== undefined) {
             (async () => {
-                const request = await fetch(`http://172.16.191.137:3000/get-beer/${data[item].id}`)
+                const request = await fetch(`http://192.168.1.111:3000/get-beer/${data[item].id}`)
                 const result = await request.json()
                 dispatch({ type: 'updateBeer', beerInfo: result })
             })()
             props.navigation.navigate('Homepage', { screen: 'BeerInfo' })
         } else {
             (async () => {
-                const request = await fetch(`http://172.16.191.137:3000/get-brewery/${data[item].id}`);
+                const request = await fetch(`http://192.168.1.111:3000/get-brewery/${data[item].id}`);
                 const result = await request.json()
                 dispatch({ type: 'selectedBrewerie', brewery: result })
             })()

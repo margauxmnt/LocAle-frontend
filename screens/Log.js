@@ -1,6 +1,12 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, Button, ScrollView } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, Image, Button } from 'react-native'
 import { Input } from 'react-native-elements'
+/*Import pour la connexion FB*/
+import * as Facebook from 'expo-facebook';
+
+
+
+
 
 
 
@@ -21,7 +27,7 @@ export default function Log(props) {
     }
 
 
-    
+
 
     /*SignUp*/
     const [signUpPseudo, setSignUpPseudo] = useState('')
@@ -51,6 +57,8 @@ export default function Log(props) {
         }
     }
 
+    /*Connexion Facebook*/
+
     /*Sign In*/
     const [signInEmail, setSignInEmail] = useState('')
     const [signInPassword, setSignInPassword] = useState('')
@@ -59,27 +67,27 @@ export default function Log(props) {
 
 
     let handleSubmitSignin = async () => {
- 
+
         const data = await fetch('http://192.168.1.111:3000/users/sign-in', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: `email=${signInEmail}&password=${signInPassword}`
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `email=${signInEmail}&password=${signInPassword}`
         })
-    
+
         const body = await data.json()
-    
-        if(body.result == true){
-          props.addToken(body.token)
-          setUserExists(true)
-          
-        }  else {
-          setErrorsSignin(body.error)
+
+        if (body.result == true) {
+            props.addToken(body.token)
+            setUserExists(true)
+
+        } else {
+            setErrorsSignin(body.error)
         }
-      }
-    
-      let tabErrorsSignin = listErrorsSignin.map((error,i) => {
-        return(<Text>{error}</Text>)
-      })
+    }
+
+    let tabErrorsSignin = listErrorsSignin.map((error, i) => {
+        return (<Text>{error}</Text>)
+    })
 
 
 
@@ -99,9 +107,13 @@ export default function Log(props) {
                         <Button onPress={() => toogle()} style={styles.email} color="#fff" title="Adresse mail"></Button>
                     </View>
 
-                    <View style={styles.backgroundTexte}>
-                        <Text style={styles.email}>Facebook</Text>
+                    <View style={styles.authButtonView}>
+                        <Button title="Start" onPress={handleStartPress} />
+                        <View style={styles.socialButtonsView}>
+                            <Button title="Facebook" onPress={handleFBLoginPress} />
+                        </View>
                     </View>
+
 
                     <View style={styles.backgroundTexte}>
                         <Text style={styles.email}>Google</Text>
@@ -144,7 +156,7 @@ export default function Log(props) {
 
 
 
-            <View style={{ display: 'flex', height:'100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
+            <View style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
 
                 <View>
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
