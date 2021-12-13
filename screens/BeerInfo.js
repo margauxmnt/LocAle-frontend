@@ -8,19 +8,13 @@ import MapView, { Marker } from 'react-native-maps';
 import { Button, Modal, FormControl, Input, Center, NativeBaseProvider } from "native-base"
 import IPADRESS from '../AdressIP'
 
-const currentPosition = {
-    latitude: 45.763420,
-    longitude: 4.834277,
-}
-
-
 export default function BeerInfo({ navigation }) {
 
     const beerInfo = useSelector(store => store.beerInfo)
     const wishlist = useSelector(store => store.wishlist)
     const token = useSelector(store => store.token)
     const dispatch = useDispatch()
-    // const currentPosition = useSelector(store => store.initialPosition)
+    const currentPosition = useSelector(store => store.location)
 
     const [sellers, setSellers] = useState([]);
     const [region, setRegion] = useState(currentPosition)
@@ -32,7 +26,11 @@ export default function BeerInfo({ navigation }) {
 
     useEffect(() => {
         const getSellers = async () => {
+<<<<<<< HEAD
             const request = await fetch(`http://${IPADRESS}:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
+=======
+            const request = await fetch(`http://172.16.190.147:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
+>>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
             const result = await request.json()
             setSellers(result.sellers)
         }
@@ -126,7 +124,11 @@ export default function BeerInfo({ navigation }) {
 
 
     const goBack = async () => {
+<<<<<<< HEAD
         const request = await fetch(`http://${IPADRESS}:3000/get-brewery-from-beer/${beerInfo._id}`)
+=======
+        const request = await fetch(`http://172.16.190.147:3000/get-brewery-from-beer/${beerInfo._id}`)
+>>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
         const result = await request.json()
         dispatch({ type: 'selectedBrewerie', brewery: result })
         navigation.navigate('BeerList')
@@ -135,7 +137,11 @@ export default function BeerInfo({ navigation }) {
 
     const addNote = async () => {
         if(token !== ''){
+<<<<<<< HEAD
             const request = await fetch(`http://${IPADRESS}:3000/users/add-note`, {
+=======
+            const request = await fetch('http://172.16.190.147:3000/users/add-note', {
+>>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
@@ -159,7 +165,11 @@ export default function BeerInfo({ navigation }) {
                 dispatch({type: 'removeFromWishlist', beer: beer})
                 setLike(false);
             }
+<<<<<<< HEAD
             await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+=======
+            await fetch(`http://172.16.190.147:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+>>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
         }else{
             navigation.navigate('StackNav', {screen: 'Log'})
         }
@@ -207,14 +217,14 @@ export default function BeerInfo({ navigation }) {
                     <MapView
                         style={{ width: '100%', height: 200 }}
                         region={{
-                            latitude: region.latitude,
-                            longitude: region.longitude,
+                            latitude: region.coords.latitude,
+                            longitude: region.coords.longitude,
                             latitudeDelta: 0.04,
                             longitudeDelta: 0.0421,
                         }}
                     >
                         {markers}
-                        <MapView.Marker coordinate={currentPosition} >
+                        <MapView.Marker coordinate={region.coords} >
                             <View style={{ height: 15, width: 15, backgroundColor: '#737CD3', borderRadius: 50, borderWidth: 3, borderColor: "#FCFCFC" }} />
                         </MapView.Marker>
                     </MapView>
@@ -371,7 +381,7 @@ const styles = StyleSheet.create({
     },
     card: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
+        borderTopWidth: 1,
         borderColor: '#194454',
         padding: 5,
     },

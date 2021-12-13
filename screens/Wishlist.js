@@ -18,11 +18,19 @@ export default function Wishlist({ navigation }) {
 
     const moveFromWishlist = async (beer) => {
         dispatch({type: 'removeFromWishlist', beer: beer})
+<<<<<<< HEAD
         await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
     }
 
     const moreInfoBeer = async (beer) => {
         const request = await fetch(`http://${IPADRESS}:3000/get-beer/${beer._id}`)
+=======
+        await fetch(`http://172.16.190.147:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+    }
+
+    const moreInfoBeer = async (beer) => {
+        const request = await fetch(`http://172.16.190.147:3000/get-beer/${beer._id}`)
+>>>>>>> 266b9f2ad8f4620bb33e87bd13f4a90a3b15ed4b
         const result = await request.json()
 
         dispatch({ type: 'updateBeer', beerInfo: result })

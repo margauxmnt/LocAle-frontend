@@ -53,8 +53,6 @@ export default function BeerList({ navigation }) {
                   })
             }
             await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
-
-            
         } else {
             navigation.navigate('StackNav', { screen: 'Log' })
         }
