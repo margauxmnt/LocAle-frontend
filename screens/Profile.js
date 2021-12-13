@@ -5,15 +5,17 @@ import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import IPADRESS from '../AdressIP';
 
 export default function Profile({ navigation }) {
 
     //récupération du token dans le store
     const token = useSelector(store => store.token)
+    const userNotes = useSelector(store => store.userNotes)
     const dispatch = useDispatch()
     //variable contenant les infos de l'utilisateur
     const [user, setUser] = useState({});
+    const [image, setImage] = useState('')
 
 
     useEffect(() => {
@@ -22,16 +24,19 @@ export default function Profile({ navigation }) {
         } else {
             async function getUserInfos() {
                 //attention ADRESSE IP à changer en fonction
-                let rawResponse = await fetch(`http://192.168.1.42:3000/users/get-user-infos?token=${token}`);
+                let rawResponse = await fetch(`http://${IPADRESS}:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
                 setUser(response.user)
-            }; getUserInfos();
+                dispatch({type: 'updateNotes', userNotes: response.user.notes})
+            }; 
+            getUserInfos();
         }
+
     }, [token]);
 
 
     const moreInfoBeer = async (beer) => {
-        const request = await fetch(`http://192.168.1.42:3000/get-beer/${beer._id}`)
+        const request = await fetch(`http://${IPADRESS}:3000/get-beer/${beer._id}`)
         const result = await request.json()
         
         dispatch({ type: 'updateBeer', beerInfo: result })
@@ -41,11 +46,11 @@ export default function Profile({ navigation }) {
 
     const logout = () => {
         //non fonctionnel, redirige vers la home puis vers le login et ne remet pas à jour le profil
-        // navigation.navigate('StackNav', {screen: 'Homepage'})
-        // dispatch({type: 'addToken', token: ''})
-        // dispatch({type: 'updateWishlist', wishlist: {}})
-        // AsyncStorage.removeItem('userEmail');
-        // AsyncStorage.removeItem('userPassword');
+        dispatch({type: 'addToken', token: ''})
+        dispatch({type: 'updateWishlist', wishlist: {}})
+        AsyncStorage.removeItem('userEmail');
+        AsyncStorage.removeItem('userPassword');
+        navigation.navigate('StackNav', {screen: 'Homepage'})
     }
 
 
@@ -54,10 +59,11 @@ export default function Profile({ navigation }) {
         return s();
     }
 
-    if (user.notes == undefined) {
-        return <View />
-    } else {
-        let userNotes = user.notes.map(function (el, i) {
+
+    // if (user.notes === undefined) {
+    //     return <View />
+    // } else {
+        let Notes = userNotes.map(function (el, i) {
             return (
                 <TouchableOpacity key={i} onPress={() => moreInfoBeer(el.beer)} style={styles.card}>
                     <View>
@@ -101,7 +107,7 @@ export default function Profile({ navigation }) {
                         <View style={{ flexDirection: 'row' }}>
                             <Avatar
                                 size="xl"
-                                source={require('../assets/logo_matth_transparent.png')}
+                                source={image === '' ? require('../assets/logo_matth_transparent.png') : {uri: image}}
                             />
                             <Icon name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                         </View>
@@ -147,14 +153,14 @@ export default function Profile({ navigation }) {
 
                     {/** si il y a des commentaires laissés pas l'utilisateur  */}
                     <ScrollView>
-                        {userNotes}
+                        {Notes}
                     </ScrollView>
 
                 </View >
 
             </NativeBaseProvider>
         )
-    }
+    // }
 };
 
 const styles = StyleSheet.create({

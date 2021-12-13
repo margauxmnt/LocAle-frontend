@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import BeerCard from './BeerCard';
+import IPADRESS from '../AdressIP';
 
 
 export default function Wishlist({ navigation }) {
@@ -17,11 +18,11 @@ export default function Wishlist({ navigation }) {
 
     const moveFromWishlist = async (beer) => {
         dispatch({type: 'removeFromWishlist', beer: beer})
-        await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+        await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
     }
 
     const moreInfoBeer = async (beer) => {
-        const request = await fetch(`http://192.168.1.42:3000/get-beer/${beer._id}`)
+        const request = await fetch(`http://${IPADRESS}:3000/get-beer/${beer._id}`)
         const result = await request.json()
 
         dispatch({ type: 'updateBeer', beerInfo: result })

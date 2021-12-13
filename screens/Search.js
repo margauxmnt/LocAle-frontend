@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Typeahead, Box, Heading, useColorMode, NativeBaseProvider, Center, Image } from 'native-base';
 import { useSelector, useDispatch } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import IPADRESS from '../AdressIP';
 
 
 function TypeaheadUsingComponentWithRenderItem(props) {
@@ -15,7 +16,7 @@ function TypeaheadUsingComponentWithRenderItem(props) {
 
     useEffect(() => {
         (async () => {
-            const request = await fetch('http://192.168.1.42:3000/get-beers-n-notes')
+            const request = await fetch(`http://${IPADRESS}:3000/get-beers-n-notes`)
             const result = await request.json();
             result.forEach(el => el.note !== undefined ? el.icon = require('../assets/beer.png') : el.icon = require('../assets/brewery.png'))
             setData(result)
@@ -31,20 +32,19 @@ function TypeaheadUsingComponentWithRenderItem(props) {
     }, [filterText]);
 
     const selectSearch = async (item) => {
-        console.log(item)
         if (item !== null) {
             if (data[item].note !== undefined) {
-                const request = await fetch(`http://192.168.1.42:3000/get-beer/${data[item].id}`)
+                const request = await fetch(`http://${IPADRESS}:3000/get-beer/${data[item].id}`)
                 const result = await request.json()
                 dispatch({ type: 'updateBeer', beerInfo: result })
                 setFilterText('')
                 props.navigation.navigate('StackNav', { screen: 'BeerInfo' })
             } else {
-                const request = await fetch(`http://192.168.1.42:3000/get-brewery/${data[item].id}`);
+                const request = await fetch(`http://${IPADRESS}:3000/get-brewery/${data[item].id}`);
                 const result = await request.json()
                 dispatch({ type: 'selectedBrewerie', brewery: result })
                 setFilterText('')
-                props.navigation.navigate('Homepage')
+                props.navigation.navigate('StackNav', {screen: 'Homepage'})
             }
         }
     }

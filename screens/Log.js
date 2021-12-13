@@ -1,17 +1,21 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, Button } from 'react-native'
+import { View, Text, StyleSheet, Image, Button, TouchableOpacity } from 'react-native'
 import { Input, NativeBaseProvider } from "native-base"
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import IPADRESS from '../AdressIP';
+import * as Google from 'expo-google-app-auth';
 
 
-export default function Log({navigation}) {
+export default function Log({ navigation }) {
 
     const dispatch = useDispatch()
 
     /*Log*/
     const [display, setDisplay] = useState('flex')
     const [displayTwo, setDisplayTwo] = useState('flex')
+    const [google, setGoogle] = useState('Google')
 
     const toogle = () => {
         display === 'flex' ? setDisplay('none') : setDisplay('flex')
@@ -34,32 +38,32 @@ export default function Log({navigation}) {
 
     var handleSubmitSignup = async () => {
 
-        if(signUpPseudo !== '' || signUpEmail !== '' || signUpPassword !== ''){
-            const request = await fetch('http://192.168.1.42:3000/users/sign-up', {
+        if (signUpPseudo !== '' || signUpEmail !== '' || signUpPassword !== '') {
+            const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
             })
             const result = await request.json()
-    
-            if(result.error === ''){
+
+            if (result.error === '') {
                 AsyncStorage.setItem('userEmail', signUpEmail)
                 AsyncStorage.setItem('userPassword', signUpPassword)
-                dispatch({type: 'addToken', token: result.token})
+                dispatch({ type: 'addToken', token: result.token })
                 navigation.navigate('Profile')
-            }else if(result.error === 'Vous avez déjà un compte.') {
+            } else if (result.error === 'Vous avez déjà un compte.') {
                 setErrorSignin(result.error)
                 setSignInEmail(signUpEmail)
                 setSignUpEmail('')
                 setSignUpPassword('')
                 setSignUpPseudo('')
                 toogleTwo()
-            }else {
+            } else {
                 setErrorSignup(result.error)
                 setSignUpPseudo('')
             }
-    
-        }else setErrorSignup('Un des champs est manquant !')
+
+        } else setErrorSignup('Un des champs est manquant !')
     }
 
     /*Sign In*/
@@ -71,32 +75,32 @@ export default function Log({navigation}) {
 
     let handleSubmitSignin = async () => {
 
-        if(signInEmail !== '' || signInPassword !== ''){
-            const request = await fetch('http://192.168.1.42:3000/users/sign-in', {
+        if (signInEmail !== '' || signInPassword !== '') {
+            const request = await fetch(`http://${IPADRESS}:3000/users/sign-in`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `email=${signInEmail}&password=${signInPassword}`
             })
             const result = await request.json()
-    
-            if(result.error === ''){
+
+            if (result.error === '') {
                 // on vérifie si c'est un nouvel appareil et si il y a quelque chose dans le cache
                 // s'il n'y a rien on ajoute dans le cache
                 // si ce n'est pas un nouvel appareil et que qu'il y a quelque chose, on l'ajoute seulement si 
                 //    les identifiant de connexion sont différent
                 AsyncStorage.getItem('userEmail', (err, data) => {
-                    if(data !== signInEmail || data === null) {
-                        AsyncStorage.setItem('userEmail', signInEmail)     
+                    if (data !== signInEmail || data === null) {
+                        AsyncStorage.setItem('userEmail', signInEmail)
                         AsyncStorage.setItem('userPassword', signInPassword)
-                    }     
+                    }
                 })
-                dispatch({type: 'addToken', token: result.token})
-                dispatch({type: 'updateWishlist', wishlist: result.wishlist})
+                dispatch({ type: 'addToken', token: result.token })
+                dispatch({ type: 'updateWishlist', wishlist: result.wishlist })
                 navigation.navigate('Profile')
-            }else if(result.error === 'Mot de passe incorrect.'){
+            } else if (result.error === 'Mot de passe incorrect.') {
                 setSignInPassword('')
                 setErrorSignin(result.error)
-            }else if(result.error === 'Pas de compte avec cette adresse.'){
+            } else if (result.error === 'Pas de compte avec cette adresse.') {
                 setErrorSignin('')
                 setErrorSignup(result.error)
                 setSignUpEmail(signInEmail)
@@ -106,13 +110,59 @@ export default function Log({navigation}) {
                 setSignUpPseudo('')
                 toogleTwo()
             }
-        }else setErrorSignin('Un des champs est manquant !')        
+        } else setErrorSignin('Un des champs est manquant !')
+    }
+
+
+    const googleSignIn = async () => {
+        try {
+            setGoogle('Connexion...')
+            const res = await Google.logInAsync({
+                androidClientId: '306259259051-bg6drvukv033c769a8h8p05n5mle31bv.apps.googleusercontent.com',
+                iosClientId: '306259259051-pikjqa2b1s0uo3lqupboauqcfpjeebq6.apps.googleusercontent.com',
+                scopes: ['profile', 'email'],
+            });
+
+            if (res.type === 'success') {
+
+                // si on se connecte avec google, on essaye de créer un utilisateur
+                const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `pseudo=${res.user.givenName}&email=${res.user.email}&password=12DH5K6M8L`
+                })
+                const result = await request.json()
+
+                // si l'utilisateur est déjà créer on fait un sign in
+                if (result.error !== '') {
+                    const request2 = await fetch(`http://${IPADRESS}:3000/users/sign-in`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `email=${res.user.email}&password=12DH5K6M8L`
+                    })
+                    const result2 = await request2.json()
+                    if(result2.error === '') dispatch({ type: 'addToken', token: result2.token })
+                }else dispatch({ type: 'addToken', token: result.token })
+
+                AsyncStorage.setItem('userEmail', res.user.email)
+                AsyncStorage.setItem('userPassword', '12DH5K6M8L')
+                navigation.navigate('Profile')
+                setGoogle('Google')
+            } else {
+                console.log('not success')
+                console.log(res)
+                setGoogle('Google')
+            }
+        } catch (err) {
+            console.log(`error  ${err}`)
+        }
+
     }
 
 
 
     return (
-        <NativeBaseProvider style={{flex: 1}}>
+        <NativeBaseProvider style={{ flex: 1 }}>
 
             <View style={{ display: display, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
 
@@ -122,17 +172,21 @@ export default function Log({navigation}) {
 
                 <View>
 
-                    <View style={styles.backgroundTexte}>
-                        <Button onPress={() => toogle()} style={styles.email} color="#194454" title="Adresse mail"></Button>
-                    </View>
+                    <TouchableOpacity onPress={() => toogle()} style={styles.email} >
+                        <Text style={{ fontSize: 20, color: '#fff' }}>Adresse Mail</Text>
+                    </TouchableOpacity>
 
-                    <View style={styles.backgroundTexte}>
-                        <Text style={styles.email}>Facebook</Text>
-                    </View>
 
-                    <View style={styles.backgroundTexte}>
-                        <Text style={styles.email}>Google</Text>
-                    </View>
+                    <TouchableOpacity onPress={() => googleSignIn()} style={styles.google} >
+                        <Icon name="google" size={30} color="#fff" />
+                        <Text style={{ fontSize: 20, color: '#fff', marginLeft: 38 }}>{google}</Text>
+                    </TouchableOpacity>
+
+
+                    <TouchableOpacity style={styles.facebook} >
+                        <Icon name="facebook" size={30} color="#fff" />
+                        <Text style={{ fontSize: 20, color: '#fff', marginLeft: 38 }}>Facebook</Text>
+                    </TouchableOpacity>
 
                 </View>
 
@@ -146,7 +200,7 @@ export default function Log({navigation}) {
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
-                <Text style={{color: '#e63946'}}>{errorSignup}</Text>
+                <Text style={{ color: '#e63946' }}>{errorSignup}</Text>
 
                 <View>
 
@@ -160,10 +214,10 @@ export default function Log({navigation}) {
                         <Button title="Valider" color="#194454" onPress={() => handleSubmitSignup()}></Button>
                     </View>
 
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text onPress={() => toogleTwo()} style={styles.text}>Déjà un compte ?</Text>
                         <Text onPress={() => toogle()} style={styles.text}>Se connecter autrement.</Text>
-                    </View>                    
+                    </View>
 
                 </View>
 
@@ -177,7 +231,7 @@ export default function Log({navigation}) {
                     <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
                 </View>
 
-                <Text style={{color: '#e63946'}}>{errorSignin}</Text>
+                <Text style={{ color: '#e63946' }}>{errorSignin}</Text>
 
                 <View style={styles.containerButton}>
 
@@ -217,11 +271,16 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 50,
+        // marginBottom: 50,
     },
     email: {
-        color: '#fff',
-        fontSize: 18,
+        padding: 10,
+        margin: 20,
+        alignItems: 'center',
+        borderRadius: 5,
+        justifyContent: 'center',
+        flexDirection: 'row',
+        backgroundColor: '#194454',
     },
     /*Style SignUp*/
     backgroundColorInput: {
@@ -258,9 +317,42 @@ const styles = StyleSheet.create({
     text: {
         color: 'lightblue',
         margin: 10,
+    },
+    google: {
+        padding: 10,
+        margin: 20,
+        backgroundColor: '#4587F4',
+        alignItems: 'center',
+        borderRadius: 5,
+        flexDirection: 'row',
+    },
+    facebook: {
+        padding: 10,
+        margin: 20,
+        width: 210,
+        alignItems: 'center',
+        borderRadius: 5,
+        flexDirection: 'row',
+        backgroundColor: '#3A579D',
     }
 
 })
+
+function generateP() {
+    var pass = '';
+    var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+        'abcdefghijklmnopqrstuvwxyz0123456789@#$';
+
+    for (i = 1; i <= 8; i++) {
+        var char = Math.floor(Math.random()
+            * str.length + 1);
+
+        pass += str.charAt(char)
+    }
+
+    return pass;
+}
+
 
 
 
