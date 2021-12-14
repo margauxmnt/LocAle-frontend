@@ -19,17 +19,18 @@ export default function Profile({ navigation }) {
     //ouverture modale pour editer le pseudo
     const [showModal, setShowModal] = useState(false)
     const [newPseudo, setNewPseudo] = useState('');
-
+    //update de l'avatar
+    const [imageKey, setimageKey] = useState(1);
+    
     useEffect(() => {
         if (token === '') {
             navigation.navigate('StackNav', { screen: 'Log' });
         } else {
             async function getUserInfos() {
-                //attention ADRESSE IP à changer en fonction
                 let rawResponse = await fetch(`http://${IPADRESS}:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
                 setUser(response.user)
-                dispatch({type: 'updateNotes', userNotes: response.userNotes})
+                dispatch({ type: 'updateNotes', userNotes: response.userNotes })
             }; getUserInfos();
 
             async function getPermission() {
@@ -39,7 +40,6 @@ export default function Profile({ navigation }) {
                 }
             }; getPermission();
         }
-
     }, [token]);
 
 
@@ -69,13 +69,28 @@ export default function Profile({ navigation }) {
         });
         if (!image.cancelled) {
 
-            const request = await fetch(`http://${IPADRESS}:3000/users/update-picture`, {
+            let userCopy = {...user};
+            userCopy.avatar = image.uri;
+            setUser(userCopy)
+
+            var data = new FormData();
+            data.append('avatar', {
+                uri: image.uri,
+                type: 'image/jpeg',
+                name: token,
+            });
+
+            const request = await fetch(`http://${IPADRESS}:3000/users/update-picture/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `avatar=${image.uri}&token=${token}`
+                body: data
             })
-            const result = await request.json()
-            console.log(result)
+            const result = await request.json();
+            setimageKey(prev => prev +1)
+            
+            // console.log('before set')
+            // setUser(result.user)
+            // console.log('set user')
         }
     };
 
@@ -95,7 +110,7 @@ export default function Profile({ navigation }) {
 
 
     let Notes = [];
-    if (userNotes.length === 0){
+    if (userNotes.length === 0) {
         Notes.push(
             <View style={styles.card}>
                 <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
@@ -127,100 +142,108 @@ export default function Profile({ navigation }) {
                     </View>
                 </TouchableOpacity>
             )
-        })        
-    } 
+        })
+    }
 
+    // console.log(user.avatar)
 
-    return (
-        <NativeBaseProvider>
+    if (user.avatar === undefined) {
+        return (
+            <View></View>
+        )
+    } else {
+        return (
+            <NativeBaseProvider>
 
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Mon compte</Text>
-            </View>
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>Mon compte</Text>
+                </View>
 
-            <View style={styles.container} >
+                <View style={styles.container} >
 
-                <Ionicons onPress={() => logout()} style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
+                    <Ionicons onPress={() => logout()} style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
 
-                <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
+                    <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
 
-                    <View style={{ flexDirection: 'row' }}>
-                        <Avatar
-                            size="xl"
-                                source={user.avatar !== 'default' ? user.avatar : require('../assets/logo_matth_transparent.png') }
-                        />
-                        <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
-                    </View>
-
-                    <View style={styles.userInfos}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ color: '#194454', fontSize: 20 }}>{newPseudo !== '' ? newPseudo : user.pseudo}</Text>
-                            <Icon onPress={() => setShowModal(true)} name="edit" size={15} style={styles.editIcon} />
+                        <View style={{ flexDirection: 'row' }}>
+                            <Avatar
+                                size="xl"
+                                source={user.avatar !== 'default' ? { uri: user.avatar } : require('../assets/logo_matth_transparent.png')}
+                                key={imageKey}
+                            />
+                            <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                         </View>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
-                            <Icon name="edit" size={15} style={styles.editIcon} />
+                        <View style={styles.userInfos}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', fontSize: 20 }}>{newPseudo !== '' ? newPseudo : user.pseudo}</Text>
+                                <Icon onPress={() => setShowModal(true)} name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
+                                <Icon name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <Text style={{ color: '#194454', marginTop: 15 }}>
+                                Date inscription: 12/12/2012
+                            </Text>
                         </View>
-
-                        <Text style={{ color: '#194454', marginTop: 15 }}>
-                            Date inscription: 12/12/2012
-                        </Text>
                     </View>
-                </View>
 
-                <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
-                    <Button
-                        onPress={() => navigation.navigate('Wishlist')}
-                        style={styles.toWishlist}
-                        size="lg"
-                        leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
-                        _text={{ fontSize: 20 }}
-                    >
-                        Mes Favorites
-                    </Button>
-                </View>
+                    <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
+                        <Button
+                            onPress={() => navigation.navigate('Wishlist')}
+                            style={styles.toWishlist}
+                            size="lg"
+                            leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
+                            _text={{ fontSize: 20 }}
+                        >
+                            Mes Favorites
+                        </Button>
+                    </View>
 
-                <View style={styles.headerNotes}>
-                    <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
-                </View>
+                    <View style={styles.headerNotes}>
+                        <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
+                    </View>
 
-                <ScrollView>
-                    {Notes}
-                </ScrollView>
+                    <ScrollView>
+                        {Notes}
+                    </ScrollView>
 
-                <Center flex={1}>
-                    <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                        <Modal.Content maxWidth="400px">
-                            <Modal.CloseButton />
-                            <Modal.Header>Modifie tes informations de profil</Modal.Header>
-                            <Modal.Body>
-                                <FormControl>
-                                    <FormControl.Label>Nouveau pseudo</FormControl.Label>
-                                    <Input onChangeText={(v) => setNewPseudo(v)} />
-                                </FormControl>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button.Group space={2}>
-                                    <Button
-                                        style={styles.modalButton}
-                                        onPress={() => {
-                                            editPseudo();
-                                            setShowModal(false)
-                                        }}
-                                    >
-                                        Valider
-                                    </Button>
-                                </Button.Group>
-                            </Modal.Footer>
-                        </Modal.Content>
-                    </Modal>
-                </Center>
+                    <Center flex={1}>
+                        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                            <Modal.Content maxWidth="400px">
+                                <Modal.CloseButton />
+                                <Modal.Header>Modifie tes informations de profil</Modal.Header>
+                                <Modal.Body>
+                                    <FormControl>
+                                        <FormControl.Label>Nouveau pseudo</FormControl.Label>
+                                        <Input onChangeText={(v) => setNewPseudo(v)} />
+                                    </FormControl>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button.Group space={2}>
+                                        <Button
+                                            style={styles.modalButton}
+                                            onPress={() => {
+                                                editPseudo();
+                                                setShowModal(false)
+                                            }}
+                                        >
+                                            Valider
+                                        </Button>
+                                    </Button.Group>
+                                </Modal.Footer>
+                            </Modal.Content>
+                        </Modal>
+                    </Center>
 
-            </View >
+                </View >
 
-        </NativeBaseProvider>
-    )
+            </NativeBaseProvider>
+        )
+    }
     // }
 };
 

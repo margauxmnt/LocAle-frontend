@@ -77,7 +77,7 @@ export default function BeerInfo({ navigation }) {
     let BeerNotes = [];
 
     if (beerInfo.notes.length === 0) BeerNotes.push(
-        <View style={{ padding: 20 }}>
+        <View style={{ borderTopWidth: 1, padding: 20 }}>
             <Text style={{ width: '80%', color: "lightgrey", fontSize: 18 }}>Cette bière n'a pas encore de note, ajoute en une !</Text>
         </View>
     )

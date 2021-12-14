@@ -63,8 +63,9 @@ export default function Homepage({ navigation }) {
             if (status == 'granted') {
                 // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
                 await Location.watchPositionAsync({ distanceInterval: 10 },
-                    (location) => { setLocation(location) });
-                dispatch({ type: 'userLocalisation', location });
+                    (loc) => { 
+                        setLocation(loc); 
+                        dispatch({ type: 'userLocalisation', location: loc }) });
             }
         } askPermission();
 
