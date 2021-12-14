@@ -68,6 +68,7 @@ export default function Profile({ navigation }) {
             quality: 1,
         });
         if (!image.cancelled) {
+
             const request = await fetch(`http://${IPADRESS}:3000/users/update-picture`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
