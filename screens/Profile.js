@@ -96,7 +96,7 @@ export default function Profile({ navigation }) {
         AsyncStorage.removeItem('userEmail');
         AsyncStorage.removeItem('userPassword');
         setUser({});
-        navigation.popToTop('StackNav')
+        navigation.navigate('StackNav', {screen: 'Homepage'})
     }
 
     // --- stars by note --- //

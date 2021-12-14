@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, Button, TouchableOpacity } from 'react-native'
 import { Input, NativeBaseProvider } from "native-base"
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IPADRESS from '../AdressIP';
 import * as Facebook from 'expo-facebook';
 import * as Google from 'expo-google-app-auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function Log({ navigation }) {
 
     const dispatch = useDispatch()
+    const token = useSelector(store => store.token)
+
+    // pour forcer à renvoyer vers la homepage quand on se logout ou si on appuie sur le logo juste après s'être login
+    useFocusEffect(
+        React.useCallback(() => {
+            if(token !== '') navigation.navigate('StackNav', {screen: 'Homepage'})
+            return () => {  }
+        }, [token])
+    )
+    
 
     /*Log*/
     const [display, setDisplay] = useState('flex')
@@ -67,22 +78,7 @@ export default function Log({ navigation }) {
         } else setErrorSignup('Un des champs est manquant !')
     }
 
-    /*Connexion Facebook*/
-    async function handleFBLoginPress() {
-        await Facebook.initializeAsync({
-            appId: '1005835353329669',
-        });
-        const { type, token, expirationDate, permissions, declinedPermissions } =
-            await Facebook.logInWithReadPermissionsAsync({
-                permissions: ['public_profile'],
-            });
-            if (type === 'success') {
-                // Get the user's name using Facebook's Graph API
-                let response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
-                response = await response.json()
-                console.log(response)
-            }
-    }
+    
 
 
     /*Sign In*/
@@ -130,6 +126,24 @@ export default function Log({ navigation }) {
                 toogleTwo()
             }
         } else setErrorSignin('Un des champs est manquant !')
+    }
+
+
+    /*Connexion Facebook*/
+    const facebookLogin = async () => {
+        await Facebook.initializeAsync({
+            appId: '1005835353329669',
+        });
+        const { type, token, expirationDate, permissions, declinedPermissions } =
+            await Facebook.logInWithReadPermissionsAsync({
+                permissions: ['public_profile'],
+            });
+            if (type === 'success') {
+                // Get the user's name using Facebook's Graph API
+                let response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
+                response = await response.json()
+                console.log(response)
+            }
     }
 
 
@@ -204,7 +218,7 @@ export default function Log({ navigation }) {
                     </TouchableOpacity>
 
 
-                    <TouchableOpacity onPress={handleFBLoginPress} style={styles.facebook} >
+                    <TouchableOpacity onPress={() => facebookLogin()} style={styles.facebook} >
                         <Icon name="facebook" size={30} color="#fff" />
                         <Text style={{ fontSize: 20, color: '#fff', marginLeft: 38 }}>Facebook</Text>
                     </TouchableOpacity>

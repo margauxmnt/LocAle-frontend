@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
         width: '90%'
     },
     beerButton: {
-        backgroundColor: '#FAE16C',
+        backgroundColor: '#F9D512', 
         borderRadius: 50,
     },
     beweriesOpening: {
