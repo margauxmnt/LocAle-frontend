@@ -25,8 +25,9 @@ import location from './reducers/location.reducer';
 import selectedBrewerie from "./reducers/selectedBrewerie.reducer";
 import token from './reducers/token.reducer';
 import wishlist from './reducers/wishlist.reducer';
+import userNotes from './reducers/userNotes.reducer'
 
-const store = createStore(combineReducers({ breweries, beerInfo, location, selectedBrewerie, token, wishlist}));
+const store = createStore(combineReducers({ breweries, beerInfo, location, selectedBrewerie, token, wishlist, userNotes}));
 
 export default function App() {
   return (

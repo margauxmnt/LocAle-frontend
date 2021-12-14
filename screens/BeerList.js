@@ -10,6 +10,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 // composant
 import BeerCard from "./BeerCard";
+import IPADRESS from '../AdressIP'
+import { useToast, NativeBaseProvider } from 'native-base';
+
 
 export default function BeerList({ navigation }) {
 
@@ -18,11 +21,12 @@ export default function BeerList({ navigation }) {
     const selectedBrewerie = useSelector(store => store.selectedBrewerie)
     const wishlist = useSelector(store => store.wishlist)
     const token = useSelector(store => store.token)
+    const toast = useToast()
 
 
     useEffect(() => {
         async function loadData() {
-            let request = await fetch(`http://192.168.1.111:3000/get-beers/${selectedBrewerie._id}`)
+            let request = await fetch(`http://${IPADRESS}:3000/get-beers/${selectedBrewerie._id}`)
             let result = await request.json()
             setBeers(result.beers)
         }
@@ -34,10 +38,20 @@ export default function BeerList({ navigation }) {
         if (token !== '') {
             if (isInWishlist) {
                 dispatch({ type: 'addToWishList', beer: beer })
+                toast.show({
+                    title: "Bière ajoutée dans les favorites !",
+                    status: "success",
+                    placement: 'top',
+                  })
             } else {
                 dispatch({ type: 'removeFromWishlist', beer: beer })
+                toast.show({
+                    title: "Bière retirée des favorites !",
+                    status: "danger",
+                    placement: 'top',
+                  })
             }
-            await fetch(`http://192.168.1.111:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+            await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
         } else {
             navigation.navigate('StackNav', { screen: 'Log' })
         }
@@ -57,24 +71,26 @@ export default function BeerList({ navigation }) {
     })
 
     return (
-        <View style={{ backgroundColor: '#194454', flex: 1 }}>
-            <View style={styles.topBar} >
-                <Icon onPress={() => {
-                    dispatch({ type: 'selectedBrewerie', brewery: '' })
-                    navigation.navigate('Homepage');
-                }}
-                    style={styles.icon}
-                    name="chevron-left"
-                    size={30}
-                    color="#fff"
-                />
-                <Text style={styles.text}>{selectedBrewerie.name}</Text>
-            </View>
+        <NativeBaseProvider>
+            <View style={{ backgroundColor: '#194454', flex: 1 }}>
+                <View style={styles.topBar} >
+                    <Icon onPress={() => {
+                        dispatch({ type: 'selectedBrewerie', brewery: '' })
+                        navigation.navigate('Homepage');
+                    }}
+                        style={styles.icon}
+                        name="chevron-left"
+                        size={30}
+                        color="#fff"
+                    />
+                    <Text style={styles.text}>{selectedBrewerie.name}</Text>
+                </View>
 
-            <ScrollView>
-                {cards}
-            </ScrollView>
-        </View>
+                <ScrollView>
+                    {cards}
+                </ScrollView>
+            </View>
+        </NativeBaseProvider>
     )
 };
 

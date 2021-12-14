@@ -5,12 +5,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
-import { Button, Modal, FormControl, Input, Center, NativeBaseProvider } from "native-base"
-
-const currentPosition = {
-    latitude: 45.763420,
-    longitude: 4.834277,
-}
+import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, useToast } from "native-base"
+import IPADRESS from '../AdressIP'
 
 
 export default function BeerInfo({ navigation }) {
@@ -19,19 +15,21 @@ export default function BeerInfo({ navigation }) {
     const wishlist = useSelector(store => store.wishlist)
     const token = useSelector(store => store.token)
     const dispatch = useDispatch()
-    // const currentPosition = useSelector(store => store.initialPosition)
+    const currentPosition = useSelector(store => store.location)
 
     const [sellers, setSellers] = useState([]);
-    const [region, setRegion] = useState(currentPosition)
+    const [region, setRegion] = useState([])
     const [showModal, setShowModal] = useState(false)
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');
     const [like, setLike] = useState(false)
+    const toast = useToast()
+
 
 
     useEffect(() => {
         const getSellers = async () => {
-            const request = await fetch(`http://192.168.1.111:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
+            const request = await fetch(`http://${IPADRESS}:3000/get-sellers/${JSON.stringify(currentPosition)}/${beerInfo._id}`)
             const result = await request.json()
             setSellers(result.sellers)
         }
@@ -125,7 +123,7 @@ export default function BeerInfo({ navigation }) {
 
 
     const goBack = async () => {
-        const request = await fetch(`http://192.168.1.42:3000/get-brewery-from-beer/${beerInfo._id}`)
+        const request = await fetch(`http://${IPADRESS}:3000/get-brewery-from-beer/${beerInfo._id}`)
         const result = await request.json()
         dispatch({ type: 'selectedBrewerie', brewery: result })
         navigation.navigate('BeerList')
@@ -133,32 +131,44 @@ export default function BeerInfo({ navigation }) {
 
 
     const addNote = async () => {
-        if(token !== ''){
-            const request = await fetch('http://192.168.1.111:3000/users/add-note', {
+        if (token !== '') {
+            const request = await fetch(`http://${IPADRESS}:3000/users/add-note`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
             })
             const result = await request.json()
-            dispatch({ type: 'addBeerNote', note: result })
-        }else {
-            navigation.navigate('StackNav', {screen: 'Log'})
+
+            dispatch({ type: 'addBeerNote', note: result.saveNote })
+            dispatch({ type: 'addUserNote', userNote: result.saveNote, beer: result.beer })
+        } else {
+            navigation.navigate('StackNav', { screen: 'Log' })
         }
     }
 
 
     const addToWishlist = async (beer, isInWishlist) => {
-        if(token !== ''){
-            if(!isInWishlist){
-                dispatch({type: 'addToWishList', beer: beer})
+        if (token !== '') {
+            if (!isInWishlist) {
+                toast.show({
+                    title: "Bière ajoutée dans les favorites !",
+                    status: "success",
+                    placement: 'top',
+                })
+                dispatch({ type: 'addToWishList', beer: beer })
                 setLike(true);
-            }else {
-                dispatch({type: 'removeFromWishlist', beer: beer})
+            } else {
+                toast.show({
+                    title: "Bière retirée des favorites !",
+                    status: "danger",
+                    placement: 'top',
+                })
+                dispatch({ type: 'removeFromWishlist', beer: beer })
                 setLike(false);
             }
-            await fetch(`http://192.168.1.111:3000/users/add-To-Wishlist/${beer._id}/${token}`)
-        }else{
-            navigation.navigate('StackNav', {screen: 'Log'})
+            await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+        } else {
+            navigation.navigate('StackNav', { screen: 'Log' })
         }
     }
 
@@ -204,8 +214,8 @@ export default function BeerInfo({ navigation }) {
                     <MapView
                         style={{ width: '100%', height: 200 }}
                         region={{
-                            latitude: region.latitude,
-                            longitude: region.longitude,
+                            latitude: currentPosition.latitude,
+                            longitude: currentPosition.longitude,
                             latitudeDelta: 0.04,
                             longitudeDelta: 0.0421,
                         }}
@@ -368,7 +378,7 @@ const styles = StyleSheet.create({
     },
     card: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
+        borderTopWidth: 1,
         borderColor: '#194454',
         padding: 5,
     },

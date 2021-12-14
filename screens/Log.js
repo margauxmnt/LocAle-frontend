@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image, Button } from 'react-native'
+import { View, Text, StyleSheet, Image, Button, TouchableOpacity } from 'react-native'
 import { Input, NativeBaseProvider } from "native-base"
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-/*Import pour la connexion FB*/
+import Icon from 'react-native-vector-icons/FontAwesome';
+import IPADRESS from '../AdressIP';
 import * as Facebook from 'expo-facebook';
-
-
-
-
+import * as Google from 'expo-google-app-auth';
 
 
 export default function Log({ navigation }) {
@@ -18,6 +16,7 @@ export default function Log({ navigation }) {
     /*Log*/
     const [display, setDisplay] = useState('flex')
     const [displayTwo, setDisplayTwo] = useState('flex')
+    const [google, setGoogle] = useState('Google')
 
     const toogle = () => {
         display === 'flex' ? setDisplay('none') : setDisplay('flex')
@@ -41,10 +40,10 @@ export default function Log({ navigation }) {
     var handleSubmitSignup = async () => {
 
         if (signUpPseudo !== '' || signUpEmail !== '' || signUpPassword !== '') {
-            const request = await fetch('http://192.168.1.111:3000/users/sign-up', {
+            const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}`
+                body: `pseudo=${signUpPseudo}&email=${signUpEmail}&password=${signUpPassword}&avatar=default`
             })
             const result = await request.json()
 
@@ -84,10 +83,6 @@ export default function Log({ navigation }) {
                 console.log(response)
             }
     }
-    /*Connexion Google*/
-    async function handleGLLoginPress() {
-
-    }
 
 
     /*Sign In*/
@@ -100,7 +95,7 @@ export default function Log({ navigation }) {
     let handleSubmitSignin = async () => {
 
         if (signInEmail !== '' || signInPassword !== '') {
-            const request = await fetch('http://192.168.1.111:3000/users/sign-in', {
+            const request = await fetch(`http://${IPADRESS}:3000/users/sign-in`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `email=${signInEmail}&password=${signInPassword}`
@@ -138,6 +133,54 @@ export default function Log({ navigation }) {
     }
 
 
+    const googleSignIn = async () => {
+        try {
+            setGoogle('Connexion...')
+            const res = await Google.logInAsync({
+                androidClientId: '306259259051-bg6drvukv033c769a8h8p05n5mle31bv.apps.googleusercontent.com',
+                iosClientId: '306259259051-pikjqa2b1s0uo3lqupboauqcfpjeebq6.apps.googleusercontent.com',
+                scopes: ['profile', 'email'],
+            });
+            
+            if (res.type === 'success') {
+                const psw = generateP();
+
+                // si on se connecte avec google, on essaye de créer un utilisateur
+                const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `pseudo=${res.user.givenName + Math.floor(Math.random()*999)}&email=${res.user.email}&password=${psw}&avatar=${res.user.photoUrl}`
+                })
+                const result = await request.json()
+                // si l'utilisateur est déjà créer on fait un sign in
+                
+                if (result.error !== '') {
+                    const request2 = await fetch(`http://${IPADRESS}:3000/users/sign-in`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `email=${res.user.email}&password=${result.password}`
+                    })
+                    const result2 = await request2.json()
+                    if(result2.error === '') dispatch({ type: 'addToken', token: result2.token })
+                }else dispatch({ type: 'addToken', token: result.token })
+
+                AsyncStorage.setItem('userEmail', res.user.email)
+                AsyncStorage.setItem('userPassword', result.password)
+                navigation.navigate('Profile')
+                setGoogle('Google')
+            } else {
+                console.log('not success')
+                console.log(res)
+                setGoogle('Google')
+            }
+        } catch (err) {
+                setGoogle('Google')
+                console.log(`error  ${err}`)
+        }
+
+    }
+
+
 
     return (
         <NativeBaseProvider style={{ flex: 1 }}>
@@ -150,21 +193,21 @@ export default function Log({ navigation }) {
 
                 <View>
 
-                    <View style={styles.backgroundTexte}>
-                        <Button onPress={() => toogle()} style={styles.email} color="#fff" title="Adresse mail"></Button>
-                    </View>
-
-                    <View style={styles.backgroundTexteFB}>
-                        {/*<Button title="Start" onPress={handleStartPress} />*/}
-                        <View style={styles.socialButtonsView}>
-                            <Button color="#fff" title="Se connecter avec Facebook" onPress={handleFBLoginPress} />
-                        </View>
-                    </View>
+                    <TouchableOpacity onPress={() => toogle()} style={styles.email} >
+                        <Text style={{ fontSize: 20, color: '#fff' }}>Adresse Mail</Text>
+                    </TouchableOpacity>
 
 
-                    <View style={styles.backgroundTexteGL}>
-                        <Button color="#fff" title="Se connecter avec Google" onPress={handleGLLoginPress} />
-                    </View>
+                    <TouchableOpacity onPress={() => googleSignIn()} style={styles.google} >
+                        <Icon name="google" size={30} color="#fff" />
+                        <Text style={{ fontSize: 20, color: '#fff', marginLeft: 38 }}>{google}</Text>
+                    </TouchableOpacity>
+
+
+                    <TouchableOpacity onPress={handleFBLoginPress} style={styles.facebook} >
+                        <Icon name="facebook" size={30} color="#fff" />
+                        <Text style={{ fontSize: 20, color: '#fff', marginLeft: 38 }}>Facebook</Text>
+                    </TouchableOpacity>
 
                 </View>
 
@@ -189,7 +232,7 @@ export default function Log({ navigation }) {
                     </View>
 
                     <View style={styles.button}>
-                        <Button title="Valider" color="#194454" onPress={() => handleSubmitSignup()}></Button>
+                        <Button title="Valider" color="#fff" onPress={() => handleSubmitSignup()}></Button>
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -221,7 +264,7 @@ export default function Log({ navigation }) {
                         </View>
 
                         <View style={styles.button}>
-                            <Button title="Valider" color="#194454" onPress={() => handleSubmitSignin()}></Button>
+                            <Button title="Valider" color="#fff" onPress={() => handleSubmitSignin()}></Button>
                         </View>
 
                         <Text onPress={() => toogleTwo()} style={styles.text}>Pas encore de compte ?</Text>
@@ -249,7 +292,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 50,
+        // marginBottom: 50,
     },
     backgroundTexteFB: {
         backgroundColor: '#3b5998',
@@ -270,8 +313,13 @@ const styles = StyleSheet.create({
         marginBottom: 50,
     },
     email: {
-        color: '#fff',
-        fontSize: 18,
+        padding: 10,
+        margin: 20,
+        alignItems: 'center',
+        borderRadius: 5,
+        justifyContent: 'center',
+        flexDirection: 'row',
+        backgroundColor: '#194454',
     },
     /*Style SignUp*/
     backgroundColorInput: {
@@ -308,9 +356,42 @@ const styles = StyleSheet.create({
     text: {
         color: 'lightblue',
         margin: 10,
+    },
+    google: {
+        padding: 10,
+        margin: 20,
+        backgroundColor: '#4587F4',
+        alignItems: 'center',
+        borderRadius: 5,
+        flexDirection: 'row',
+    },
+    facebook: {
+        padding: 10,
+        margin: 20,
+        width: 210,
+        alignItems: 'center',
+        borderRadius: 5,
+        flexDirection: 'row',
+        backgroundColor: '#3A579D',
     }
 
 })
+
+function generateP() {
+    var pass = '';
+    var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+        'abcdefghijklmnopqrstuvwxyz0123456789@#$';
+
+    for (let i = 1; i <= 8; i++) {
+        var char = Math.floor(Math.random()
+            * str.length + 1);
+
+        pass += str.charAt(char)
+    }
+
+    return pass;
+}
+
 
 
 

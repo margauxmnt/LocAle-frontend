@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "frontend",
+    "plugins": ["expo-image-picker"],
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",

@@ -3,8 +3,9 @@ import { View, StyleSheet, Text } from 'react-native';
 import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import IPADRESS from '../AdressIP';
 
 // import des composants pour initialiser la map et la géolocalisation
 import MapView, { Marker } from 'react-native-maps'
@@ -36,22 +37,23 @@ export default function Homepage({ navigation }) {
     // si une brasserie est sélectionnée, on affiche le modal et on setSelectedBrewerie
     const selectedBrewerieRedux = useSelector(store => store.selectedBrewerie)
     const token = useSelector(store => store.token)
+    const wishlist = useSelector(store => store.wishlist)
 
-    
+
     useEffect(() => {
 
         // check si l'utilisateur est déjà connecté ou non
         AsyncStorage.getItem('userEmail', (err, email) => {
             if (email !== null) {
                 AsyncStorage.getItem('userPassword', async (err, psw) => {
-                    const request = await fetch('http://192.168.1.111:3000/users/sign-in', {
+                    const request = await fetch(`http://${IPADRESS}:3000/users/sign-in`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: `email=${email}&password=${psw}`
                     })
                     const result = await request.json()
-                    dispatch({type: 'addToken', token: result.token})
-                    dispatch({type: 'updateWishlist', wishlist: result.wishlist})
+                    dispatch({ type: 'addToken', token: result.token })
+                    dispatch({ type: 'updateWishlist', wishlist: result.wishlist })
                 })
             }
         })
@@ -62,15 +64,17 @@ export default function Homepage({ navigation }) {
             if (status == 'granted') {
                 // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
                 await Location.watchPositionAsync({ distanceInterval: 10 },
-                    (location) => { setLocation(location) });
-                dispatch({ type: 'userLocalisation', location });
+                    (loc) => {
+                        setLocation(loc)
+                        dispatch({ type: 'userLocalisation', location: loc });
+                    });
             }
         } askPermission();
 
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries() {
             //attention ADRESSE IP à changer en fonction
-            const rawResponse = await fetch(`http://192.168.1.111:3000/get-breweries?position=${JSON.stringify(location)}&token=${token}`);
+            const rawResponse = await fetch(`http://${IPADRESS}:3000/get-breweries?position=${JSON.stringify(location)}&token=${token}`);
             const response = await rawResponse.json();
             if (response) {
                 setBreweries(response.breweries);
@@ -92,6 +96,7 @@ export default function Homepage({ navigation }) {
             onClose();
         }
     }, [selectedBrewerieRedux])
+
 
     //enregistrement de la brasserie sélectionnée et ouverture de la pop up avec les infos de celle ci
     //récupération du jour pour afficher les horaires du jour de la brasserie sélectionnée
@@ -191,6 +196,9 @@ export default function Homepage({ navigation }) {
                         })
                     }}
                     hideDragIndicator>
+                    <View style={styles.distance}>
+                        <Text style={styles.distanceText}>12 km</Text>
+                    </View>
                     <Actionsheet.Content borderTopRadius="0" padding={0}>
                         <Box w="100%" h={350} alignItems='center'>
                             <Box flexDirection='row' w="100%">
@@ -250,7 +258,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     headerText: {
-        // fontFamily: 'roboto',
         color: '#fff',
         fontSize: 25,
         fontWeight: 'bold',
@@ -341,4 +348,21 @@ const styles = StyleSheet.create({
         fontSize: 14,
         width: '60%'
     },
+    distance: {
+        position: 'absolute',
+        width: 80,
+        height: 33,
+        backgroundColor: '#fff',
+        borderWidth: 2,
+        borderColor: '#194454',
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: '39%',
+        right: 15,
+        borderRadius: 5,
+    },
+    distanceText: {
+        color: '#194454',
+        fontSize: 17,
+    }
 });
