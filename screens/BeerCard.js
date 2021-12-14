@@ -81,7 +81,7 @@ export default function BeerCard(props) {
                         props.beer.notes.forEach(e => globalNote += e.note);
                         globalNote = globalNote / props.beer.notes.length;
                         if (isNaN(globalNote)) return 0
-                        else return globalNote
+                        else return globalNote.toFixed(1)
                     })}
                 </Text>
 

@@ -122,30 +122,31 @@ export default function Log({ navigation }) {
                 iosClientId: '306259259051-pikjqa2b1s0uo3lqupboauqcfpjeebq6.apps.googleusercontent.com',
                 scopes: ['profile', 'email'],
             });
-
+            
             if (res.type === 'success') {
+                const psw = generateP();
 
                 // si on se connecte avec google, on essaye de créer un utilisateur
                 const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `pseudo=${res.user.givenName}&email=${res.user.email}&password=12DH5K6M8L&avatar=${res.user.photoUrl}`
+                    body: `pseudo=${res.user.givenName + Math.floor(Math.random()*999)}&email=${res.user.email}&password=${psw}&avatar=${res.user.photoUrl}`
                 })
                 const result = await request.json()
-
                 // si l'utilisateur est déjà créer on fait un sign in
+                
                 if (result.error !== '') {
                     const request2 = await fetch(`http://${IPADRESS}:3000/users/sign-in`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: `email=${res.user.email}&password=12DH5K6M8L`
+                        body: `email=${res.user.email}&password=${result.password}`
                     })
                     const result2 = await request2.json()
                     if(result2.error === '') dispatch({ type: 'addToken', token: result2.token })
                 }else dispatch({ type: 'addToken', token: result.token })
 
                 AsyncStorage.setItem('userEmail', res.user.email)
-                AsyncStorage.setItem('userPassword', '12DH5K6M8L')
+                AsyncStorage.setItem('userPassword', result.password)
                 navigation.navigate('Profile')
                 setGoogle('Google')
             } else {
@@ -154,7 +155,8 @@ export default function Log({ navigation }) {
                 setGoogle('Google')
             }
         } catch (err) {
-            console.log(`error  ${err}`)
+                setGoogle('Google')
+                console.log(`error  ${err}`)
         }
 
     }
@@ -343,7 +345,7 @@ function generateP() {
     var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
         'abcdefghijklmnopqrstuvwxyz0123456789@#$';
 
-    for (i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 8; i++) {
         var char = Math.floor(Math.random()
             * str.length + 1);
 

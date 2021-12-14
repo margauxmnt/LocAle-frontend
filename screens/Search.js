@@ -69,14 +69,22 @@ function TypeaheadUsingComponentWithRenderItem(props) {
                         else stars.push(<Icon name="star" color="#FEF5CB" size={20} />)
                     }
                 }
+                
+                let avis = [];
+                if(stars.length !== 0){
+                    avis.push(<View style={{ flexDirection: 'row' }}>{stars}</View>)
+                }else if(item.note === null){
+                    avis.push(<Text style={{color: '#194454'}}>Pas encore d'avis ...</Text>)
+                } 
 
                 return (
                     <View style={{ borderBottomWidth: 1, borderBottomColor: "#194454", backgroundColor: "#fff" }}>
                         <Box flexDirection="row" justifyContent="space-between" p={4}>
                             <View>
                                 <Text style={{ fontSize: 22, color: '#194454', fontWeight: 'bold' }}>{item.name}</Text>
-                                {item.note ? <View style={{ flexDirection: 'row' }}>{stars}</View> : <View />}
+                                {avis}
                             </View>
+                            {item.brewery ? <Text style={{color: '#194454', marginTop: 10}}>{item.brewery}</Text> : <View/>}
                             <Image source={item.icon} alt="icon" style={{ width: 30, height: 30 }} />
                         </Box>
                     </View>

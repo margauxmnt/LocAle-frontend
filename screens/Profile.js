@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IPADRESS from '../AdressIP';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Profile({ navigation }) {
 
@@ -21,15 +22,14 @@ export default function Profile({ navigation }) {
     const [newPseudo, setNewPseudo] = useState('');
 
     useEffect(() => {
-        if (token === '') {
-            navigation.navigate('StackNav', { screen: 'Log' });
-        } else {
+        if (token !== '') {
             async function getUserInfos() {
                 //attention ADRESSE IP à changer en fonction
                 let rawResponse = await fetch(`http://${IPADRESS}:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
                 setUser(response.user)
-                dispatch({type: 'updateNotes', userNotes: response.userNotes})
+
+                dispatch({ type: 'updateNotes', userNotes: response.userNotes })
             }; getUserInfos();
 
             async function getPermission() {
@@ -38,9 +38,19 @@ export default function Profile({ navigation }) {
                     alert('Sorry, we need camera roll permissions to make this work!');
                 }
             }; getPermission();
-        }
-
+        } 
     }, [token]);
+
+
+    useFocusEffect(
+        React.useCallback(() => {
+            if (token.length === 0) {
+                navigation.navigate('StackNav', { screen: 'Log' });
+            }
+            return () => {  }
+        }, [token])
+    )
+
 
 
     const moreInfoBeer = async (beer) => {
@@ -75,17 +85,18 @@ export default function Profile({ navigation }) {
                 body: `avatar=${image.uri}&token=${token}`
             })
             const result = await request.json()
-            console.log(result)
+
         }
     };
 
     const logout = () => {
         //non fonctionnel, redirige vers la home puis vers le login et ne remet pas à jour le profil
         dispatch({ type: 'addToken', token: '' })
-        dispatch({ type: 'updateWishlist', wishlist: {} })
+        dispatch({ type: 'updateWishlist', wishlist: [] })
         AsyncStorage.removeItem('userEmail');
         AsyncStorage.removeItem('userPassword');
-        navigation.navigate('StackNav', { screen: 'Homepage' })
+        setUser({});
+        navigation.popToTop('StackNav')
     }
 
     // --- stars by note --- //
@@ -95,7 +106,7 @@ export default function Profile({ navigation }) {
 
 
     let Notes = [];
-    if (userNotes.length === 0){
+    if (userNotes.length === 0) {
         Notes.push(
             <View style={styles.card}>
                 <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
@@ -127,8 +138,8 @@ export default function Profile({ navigation }) {
                     </View>
                 </TouchableOpacity>
             )
-        })        
-    } 
+        })
+    }
 
 
     return (
@@ -147,7 +158,7 @@ export default function Profile({ navigation }) {
                     <View style={{ flexDirection: 'row' }}>
                         <Avatar
                             size="xl"
-                                source={user.avatar !== 'default' ? user.avatar : require('../assets/logo_matth_transparent.png') }
+                            source={user.avatar !== 'default' ? user.avatar : require('../assets/logo_matth_transparent.png')}
                         />
                         <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                     </View>
