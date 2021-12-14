@@ -44,7 +44,7 @@ export default function Homepage({ navigation }) {
         AsyncStorage.getItem('userEmail', (err, email) => {
             if (email !== null) {
                 AsyncStorage.getItem('userPassword', async (err, psw) => {
-                    const request = await fetch('http://192.168.1.42:3000/users/sign-in', {
+                    const request = await fetch('http://192.168.1.111:3000/users/sign-in', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: `email=${email}&password=${psw}`
@@ -70,7 +70,7 @@ export default function Homepage({ navigation }) {
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries() {
             //attention ADRESSE IP à changer en fonction
-            const rawResponse = await fetch(`http://192.168.1.42:3000/get-breweries?position=${JSON.stringify(location)}&token=${token}`);
+            const rawResponse = await fetch(`http://192.168.1.111:3000/get-breweries?position=${JSON.stringify(location)}&token=${token}`);
             const response = await rawResponse.json();
             if (response) {
                 setBreweries(response.breweries);

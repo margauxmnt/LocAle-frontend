@@ -17,11 +17,11 @@ export default function Wishlist({ navigation }) {
 
     const moveFromWishlist = async (beer) => {
         dispatch({type: 'removeFromWishlist', beer: beer})
-        await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+        await fetch(`http://192.168.1.111:3000/users/add-To-Wishlist/${beer._id}/${token}`)
     }
 
     const moreInfoBeer = async (beer) => {
-        const request = await fetch(`http://192.168.1.42:3000/get-beer/${beer._id}`)
+        const request = await fetch(`http://192.168.1.111:3000/get-beer/${beer._id}`)
         const result = await request.json()
 
         dispatch({ type: 'updateBeer', beerInfo: result })

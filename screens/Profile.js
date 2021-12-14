@@ -22,7 +22,7 @@ export default function Profile({ navigation }) {
         } else {
             async function getUserInfos() {
                 //attention ADRESSE IP à changer en fonction
-                let rawResponse = await fetch(`http://192.168.1.42:3000/users/get-user-infos?token=${token}`);
+                let rawResponse = await fetch(`http://192.168.1.111:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
                 setUser(response.user)
             }; getUserInfos();
@@ -31,7 +31,7 @@ export default function Profile({ navigation }) {
 
 
     const moreInfoBeer = async (beer) => {
-        const request = await fetch(`http://192.168.1.42:3000/get-beer/${beer._id}`)
+        const request = await fetch(`http://192.168.1.111:3000/get-beer/${beer._id}`)
         const result = await request.json()
         
         dispatch({ type: 'updateBeer', beerInfo: result })

@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 // composant
 import BeerCard from "./BeerCard";
 
-
 export default function BeerList({ navigation }) {
 
     const [beers, setBeers] = useState([]);
@@ -32,16 +31,17 @@ export default function BeerList({ navigation }) {
 
 
     const addToWishlist = async (beer, isInWishlist) => {
-        if(token !== ''){
-            if(isInWishlist){
-                dispatch({type: 'addToWishList', beer: beer})
-            }else {
-                dispatch({type: 'removeFromWishlist', beer: beer})
+        if (token !== '') {
+            if (isInWishlist) {
+                dispatch({ type: 'addToWishList', beer: beer })
+            } else {
+                dispatch({ type: 'removeFromWishlist', beer: beer })
             }
-            await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
-        }else {
-            navigation.navigate('StackNav', {screen: 'Log'})
+            await fetch(`http://192.168.1.111:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+        } else {
+            navigation.navigate('StackNav', { screen: 'Log' })
         }
+
     }
 
     const moreInfoBeer = (beer) => {
@@ -52,7 +52,7 @@ export default function BeerList({ navigation }) {
 
     const cards = beers.map((el, i) => {
         let isInWishlist = false;
-        wishlist.forEach(e => { if(el._id === e._id) isInWishlist = true })
+        wishlist.forEach(e => { if (el._id === e._id) isInWishlist = true })
         return <BeerCard key={i} isInWishlist={isInWishlist} moreInfo={moreInfoBeer} indice={i} beer={el} addToWishlist={addToWishlist} />
     })
 

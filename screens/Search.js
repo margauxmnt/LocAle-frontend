@@ -34,13 +34,13 @@ function TypeaheadUsingComponentWithRenderItem(props) {
         console.log(item)
         if (item !== null) {
             if (data[item].note !== undefined) {
-                const request = await fetch(`http://192.168.1.42:3000/get-beer/${data[item].id}`)
+                const request = await fetch(`http://192.168.1.111:3000/get-beer/${data[item].id}`)
                 const result = await request.json()
                 dispatch({ type: 'updateBeer', beerInfo: result })
                 setFilterText('')
                 props.navigation.navigate('StackNav', { screen: 'BeerInfo' })
             } else {
-                const request = await fetch(`http://192.168.1.42:3000/get-brewery/${data[item].id}`);
+                const request = await fetch(`http://192.168.1.111:3000/get-brewery/${data[item].id}`);
                 const result = await request.json()
                 dispatch({ type: 'selectedBrewerie', brewery: result })
                 setFilterText('')

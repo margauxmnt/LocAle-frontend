@@ -134,7 +134,7 @@ export default function BeerInfo({ navigation }) {
 
     const addNote = async () => {
         if(token !== ''){
-            const request = await fetch('http://192.168.1.42:3000/users/add-note', {
+            const request = await fetch('http://192.168.1.111:3000/users/add-note', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
@@ -156,7 +156,7 @@ export default function BeerInfo({ navigation }) {
                 dispatch({type: 'removeFromWishlist', beer: beer})
                 setLike(false);
             }
-            await fetch(`http://192.168.1.42:3000/users/add-To-Wishlist/${beer._id}/${token}`)
+            await fetch(`http://192.168.1.111:3000/users/add-To-Wishlist/${beer._id}/${token}`)
         }else{
             navigation.navigate('StackNav', {screen: 'Log'})
         }
