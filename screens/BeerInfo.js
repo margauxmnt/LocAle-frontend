@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
-import { Button, Modal, FormControl, Input, Center, NativeBaseProvider } from "native-base"
+import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, Avatar } from "native-base"
 import IPADRESS from '../AdressIP'
 
 export default function BeerInfo({ navigation }) {
@@ -99,13 +99,17 @@ export default function BeerInfo({ navigation }) {
                 <View style={styles.cardInfo}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ margin: 10, backgroundColor: 'grey', width: 30, height: 30, borderRadius: 50, alignItems: 'center', justifyContent: 'center' }}>
-                            <Icon name="user" size={20} color="#fff" />
+                            {/* <Icon name="user" size={20} color="#fff" /> */}
+                            <Avatar
+                                size="sm"
+                                source={el.owner.avatar !== 'default' ? { uri: el.owner.avatar } : require('../assets/logo_matth_transparent.png')}
+                            />
                         </View>
-                        <Text style={{ width: 100 }}>{el.owner.pseudo}</Text>
+                        <Text style={{ width: 100, color: '#194454' }}>{el.owner.pseudo}</Text>
                     </View>
-                    <Text style={{ fontSize: 11 }}>date</Text>
+                    <Text style={{ color: '#194454', fontSize: 11 }}>date</Text>
                 </View>
-                <Text style={{ fontSize: 18, width: 180 }}>{el.comment}</Text>
+                <Text style={{ width: 180, color: '#194454', fontWeight: 'bold' }}>{el.comment}</Text>
             </View>
         </View>
     ))
