@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as WebBrowser from 'expo-web-browser';
 import IPADRESS from '../AdressIP';
 
 // import des composants pour initialiser la map et la géolocalisation
@@ -117,6 +119,11 @@ export default function Homepage({ navigation }) {
         })
     };
 
+    //ouverture modale vers le site de la brasserie sélectionnée
+    const handleOpen = (el) => {
+        WebBrowser.openBrowserAsync(el);
+    };
+
     // création des marqueurs des brasseries autour de l'utilisateur
     let localBreweriesMarkers = breweries.map(function (breweries, i) {
         return <Marker
@@ -225,6 +232,7 @@ export default function Homepage({ navigation }) {
                             <Text style={styles.beweriesDesc} >
                                 {selectedBrewerie.description}
                             </Text>
+                            
                             <Button
                                 onPress={() => {
                                     dispatch({ type: 'selectedBrewerie', brewery: selectedBrewerie });
@@ -234,12 +242,19 @@ export default function Homepage({ navigation }) {
                                 size="lg">
                                 Découvrir nos bières
                             </Button>
+                            
+                            <Ionicons
+                                onPress={() => handleOpen(selectedBrewerie.website)}
+                                name="earth" size={28} color="#8395a7" style={{ position: 'absolute', bottom: 10, right: 10 }} />
+                            
                             <Text style={styles.beweriesOpening} >
                                 {openingHours}
                             </Text>
+                            
                             <Text style={styles.beweriesAdress} >
                                 {selectedBrewerie.adress}
                             </Text>
+                
                         </Box>
                     </Actionsheet.Content>
                 </Actionsheet>
@@ -334,6 +349,7 @@ const styles = StyleSheet.create({
     beerButton: {
         backgroundColor: '#FAE16C',
         borderRadius: 50,
+        margin: 5
     },
     beweriesOpening: {
         textAlign: 'center',
