@@ -87,10 +87,6 @@ export default function Profile({ navigation }) {
             })
             const result = await request.json();
             setimageKey(prev => prev +1)
-            
-            // console.log('before set')
-            // setUser(result.user)
-            // console.log('set user')
         }
     };
 
@@ -108,6 +104,11 @@ export default function Profile({ navigation }) {
         return s();
     }
 
+    //format date
+    let dateFormat = (el) => {
+        let date = new Date(el);
+        return date.toLocaleDateString('fr-FR');
+    }
 
     let Notes = [];
     if (userNotes.length === 0) {
@@ -124,7 +125,7 @@ export default function Profile({ navigation }) {
                         <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
                     </View>
                     <View style={{ marginLeft: 10, width: '75%' }}>
-                        <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                        <Text style={{ color: '#194454', fontSize: 11 }}>{dateFormat(el.date)}</Text>
                         <View style={{ alignItems: 'center' }}>
                             <View style={styles.starContainer}>
                                 {starByNote(() => {
@@ -144,8 +145,6 @@ export default function Profile({ navigation }) {
             )
         })
     }
-
-    // console.log(user.avatar)
 
     if (user.avatar === undefined) {
         return (
@@ -186,7 +185,7 @@ export default function Profile({ navigation }) {
                             </View>
 
                             <Text style={{ color: '#194454', marginTop: 15 }}>
-                                Date inscription: 12/12/2012
+                                Date inscription: {dateFormat(user.insert_date)}
                             </Text>
                         </View>
                     </View>
