@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#194454"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -28,6 +28,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "facebookAppId": "1005835353329669",
+    "facebookDisplayName": "Loc'Ale"
     }
   }
-}
+

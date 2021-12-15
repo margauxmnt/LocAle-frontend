@@ -30,6 +30,7 @@ export default function Homepage({ navigation }) {
     const dispatch = useDispatch();
     //brasserie sélectionnée
     const [selectedBrewerie, setSelectedBrewerie] = useState({});
+    const [selectedDistance, setSelectedDistance] = useState('');
     //ouverture des infos brasserie au clic sur celle-ci
     const { isOpen, onOpen, onClose } = useDisclose();
     //horaires d'ouverture de la brasserie en fonction du jour
@@ -39,8 +40,9 @@ export default function Homepage({ navigation }) {
     // si une brasserie est sélectionnée, on affiche le modal et on setSelectedBrewerie
     const selectedBrewerieRedux = useSelector(store => store.selectedBrewerie)
     const token = useSelector(store => store.token)
+    const wishlist = useSelector(store => store.wishlist)
 
-    
+
     useEffect(() => {
 
         // check si l'utilisateur est déjà connecté ou non
@@ -53,8 +55,8 @@ export default function Homepage({ navigation }) {
                         body: `email=${email}&password=${psw}`
                     })
                     const result = await request.json()
-                    dispatch({type: 'addToken', token: result.token})
-                    dispatch({type: 'updateWishlist', wishlist: result.wishlist})
+                    dispatch({ type: 'addToken', token: result.token })
+                    dispatch({ type: 'updateWishlist', wishlist: result.wishlist })
                 })
             }
         })
@@ -97,16 +99,11 @@ export default function Homepage({ navigation }) {
         }
     }, [selectedBrewerieRedux])
 
-    // useFocusEffect( 
-    //     React.useCallback(() => {
-    //         console.log('this screen is focused')
-    //         return () => { console.log('screen unfocused')}
-    //     }, [])       
-    // )
 
     //enregistrement de la brasserie sélectionnée et ouverture de la pop up avec les infos de celle ci
     //récupération du jour pour afficher les horaires du jour de la brasserie sélectionnée
-    let selectBrewerie = (brewerie) => {
+    let selectBrewerie = (brewerie, distance) => {
+        setSelectedDistance(distance.toFixed(1))
         setSelectedBrewerie(brewerie);
         onOpen();
         let date = new Date();
@@ -128,7 +125,7 @@ export default function Homepage({ navigation }) {
     let localBreweriesMarkers = breweries.map(function (breweries, i) {
         return <Marker
             key={i}
-            onPress={() => selectBrewerie(breweries.brewerie)}
+            onPress={() => selectBrewerie(breweries.brewerie, breweries.distance)}
             coordinate={{ latitude: breweries.brewerie.latitude, longitude: breweries.brewerie.longitude }}>
             <Icon name='map-marker' size={35} color={'#194454'} />
         </Marker>
@@ -136,7 +133,7 @@ export default function Homepage({ navigation }) {
 
     //création de la liste des brasseries
     let localBreweriesList = breweries.map(function (breweries, i) {
-        return <Pressable key={i} onPress={() => selectBrewerie(breweries.brewerie)}>
+        return <Pressable key={i} onPress={() => selectBrewerie(breweries.brewerie, breweries.distance)}>
             <Box
                 rounded="lg"
                 borderColor="#194454"
@@ -207,6 +204,9 @@ export default function Homepage({ navigation }) {
                         })
                     }}
                     hideDragIndicator>
+                    <View style={styles.distance}>
+                        <Text style={styles.distanceText}>{selectedDistance} km</Text>
+                    </View>
                     <Actionsheet.Content borderTopRadius="0" padding={0}>
                         <Box w="100%" h={350} alignItems='center'>
                             <Box flexDirection='row' w="100%">
@@ -274,7 +274,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     headerText: {
-        // fontFamily: 'roboto',
         color: '#fff',
         fontSize: 25,
         fontWeight: 'bold',
@@ -347,7 +346,7 @@ const styles = StyleSheet.create({
         width: '90%'
     },
     beerButton: {
-        backgroundColor: '#FAE16C',
+        backgroundColor: '#F9D512', 
         borderRadius: 50,
         margin: 5
     },
@@ -366,4 +365,21 @@ const styles = StyleSheet.create({
         fontSize: 14,
         width: '60%'
     },
+    distance: {
+        position: 'absolute',
+        width: 80,
+        height: 33,
+        backgroundColor: '#fff',
+        borderWidth: 2,
+        borderColor: '#194454',
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: '39%',
+        right: 15,
+        borderRadius: 5,
+    },
+    distanceText: {
+        color: '#194454',
+        fontSize: 17,
+    }
 });

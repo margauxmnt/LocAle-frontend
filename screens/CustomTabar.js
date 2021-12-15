@@ -16,7 +16,7 @@ const HomeStack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   return (
-    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+    <HomeStack.Navigator initialRouteName="Homepage" screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="Homepage" component={Homepage} />
       <HomeStack.Screen name="BeerList" component={BeerList} />
       <HomeStack.Screen name="BeerInfo" component={BeerInfo} />

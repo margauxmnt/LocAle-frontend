@@ -14,7 +14,6 @@ import IPADRESS from '../AdressIP'
 import { useToast, NativeBaseProvider } from 'native-base';
 
 
-
 export default function BeerList({ navigation }) {
 
     const [beers, setBeers] = useState([]);
@@ -56,6 +55,7 @@ export default function BeerList({ navigation }) {
         } else {
             navigation.navigate('StackNav', { screen: 'Log' })
         }
+
     }
 
     const moreInfoBeer = (beer) => {

@@ -1,16 +1,28 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, Button, TouchableOpacity } from 'react-native'
 import { Input, NativeBaseProvider } from "native-base"
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IPADRESS from '../AdressIP';
+import * as Facebook from 'expo-facebook';
 import * as Google from 'expo-google-app-auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function Log({ navigation }) {
 
     const dispatch = useDispatch()
+    const token = useSelector(store => store.token)
+
+    // pour forcer à renvoyer vers la homepage quand on se logout ou si on appuie sur le logo juste après s'être login
+    useFocusEffect(
+        React.useCallback(() => {
+            if(token !== '') navigation.navigate('StackNav', {screen: 'Homepage'})
+            return () => {  }
+        }, [token])
+    )
+    
 
     /*Log*/
     const [display, setDisplay] = useState('flex')
@@ -66,6 +78,9 @@ export default function Log({ navigation }) {
         } else setErrorSignup('Un des champs est manquant !')
     }
 
+    
+
+
     /*Sign In*/
     const [signInEmail, setSignInEmail] = useState('')
     const [signInPassword, setSignInPassword] = useState('')
@@ -114,6 +129,24 @@ export default function Log({ navigation }) {
     }
 
 
+    /*Connexion Facebook*/
+    const facebookLogin = async () => {
+        await Facebook.initializeAsync({
+            appId: '1005835353329669',
+        });
+        const { type, token, expirationDate, permissions, declinedPermissions } =
+            await Facebook.logInWithReadPermissionsAsync({
+                permissions: ['public_profile'],
+            });
+            if (type === 'success') {
+                // Get the user's name using Facebook's Graph API
+                let response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
+                response = await response.json()
+                console.log(response)
+            }
+    }
+
+
     const googleSignIn = async () => {
         try {
             setGoogle('Connexion...')
@@ -122,30 +155,31 @@ export default function Log({ navigation }) {
                 iosClientId: '306259259051-pikjqa2b1s0uo3lqupboauqcfpjeebq6.apps.googleusercontent.com',
                 scopes: ['profile', 'email'],
             });
-
+            
             if (res.type === 'success') {
+                const psw = generateP();
 
                 // si on se connecte avec google, on essaye de créer un utilisateur
                 const request = await fetch(`http://${IPADRESS}:3000/users/sign-up`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `pseudo=${res.user.givenName}&email=${res.user.email}&password=12DH5K6M8L&avatar=${res.user.photoUrl}`
+                    body: `pseudo=${res.user.givenName + Math.floor(Math.random()*999)}&email=${res.user.email}&password=${psw}&avatar=${res.user.photoUrl}`
                 })
                 const result = await request.json()
-
                 // si l'utilisateur est déjà créer on fait un sign in
+                
                 if (result.error !== '') {
                     const request2 = await fetch(`http://${IPADRESS}:3000/users/sign-in`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: `email=${res.user.email}&password=12DH5K6M8L`
+                        body: `email=${res.user.email}&password=${result.password}`
                     })
                     const result2 = await request2.json()
                     if(result2.error === '') dispatch({ type: 'addToken', token: result2.token })
                 }else dispatch({ type: 'addToken', token: result.token })
 
                 AsyncStorage.setItem('userEmail', res.user.email)
-                AsyncStorage.setItem('userPassword', '12DH5K6M8L')
+                AsyncStorage.setItem('userPassword', result.password)
                 navigation.navigate('Profile')
                 setGoogle('Google')
             } else {
@@ -154,7 +188,8 @@ export default function Log({ navigation }) {
                 setGoogle('Google')
             }
         } catch (err) {
-            console.log(`error  ${err}`)
+                setGoogle('Google')
+                console.log(`error  ${err}`)
         }
 
     }
@@ -183,7 +218,7 @@ export default function Log({ navigation }) {
                     </TouchableOpacity>
 
 
-                    <TouchableOpacity style={styles.facebook} >
+                    <TouchableOpacity onPress={() => facebookLogin()} style={styles.facebook} >
                         <Icon name="facebook" size={30} color="#fff" />
                         <Text style={{ fontSize: 20, color: '#fff', marginLeft: 38 }}>Facebook</Text>
                     </TouchableOpacity>
@@ -273,6 +308,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         // marginBottom: 50,
     },
+    backgroundTexteFB: {
+        backgroundColor: '#3b5998',
+        width: 250,
+        height: 50,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 50,
+    },
+    backgroundTexteGL: {
+        backgroundColor: '#db4A39',
+        width: 250,
+        height: 50,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 50,
+    },
     email: {
         padding: 10,
         margin: 20,
@@ -343,7 +396,7 @@ function generateP() {
     var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
         'abcdefghijklmnopqrstuvwxyz0123456789@#$';
 
-    for (i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 8; i++) {
         var char = Math.floor(Math.random()
             * str.length + 1);
 

@@ -5,8 +5,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
-import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, Avatar } from "native-base"
+import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, Avatar, useToast } from "native-base"
 import IPADRESS from '../AdressIP'
+
 
 export default function BeerInfo({ navigation }) {
 
@@ -17,12 +18,13 @@ export default function BeerInfo({ navigation }) {
     const currentPosition = useSelector(store => store.location)
 
     const [sellers, setSellers] = useState([]);
-    const [region, setRegion] = useState(currentPosition)
+    // const [region, setRegion] = useState([])
     const [showModal, setShowModal] = useState(false)
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');
     const [like, setLike] = useState(false);
     const [imageKey, setimageKey] = useState(1);
+    const toast = useToast()
 
 
     useEffect(() => {
@@ -141,34 +143,44 @@ export default function BeerInfo({ navigation }) {
 
 
     const addNote = async () => {
-        if(token !== ''){
+        if (token !== '') {
             const request = await fetch(`http://${IPADRESS}:3000/users/add-note`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
             })
             const result = await request.json()
-            
+
             dispatch({ type: 'addBeerNote', note: result.saveNote })
-            dispatch({ type: 'addUserNote', userNote: result.saveNote, beer: result.beer})
-        }else {
-            navigation.navigate('StackNav', {screen: 'Log'})
+            dispatch({ type: 'addUserNote', userNote: result.saveNote, beer: result.beer })
+        } else {
+            navigation.navigate('StackNav', { screen: 'Log' })
         }
     }
 
 
     const addToWishlist = async (beer, isInWishlist) => {
-        if(token !== ''){
-            if(!isInWishlist){
-                dispatch({type: 'addToWishList', beer: beer})
+        if (token !== '') {
+            if (!isInWishlist) {
+                toast.show({
+                    title: "Bière ajoutée dans les favorites !",
+                    status: "success",
+                    placement: 'top',
+                })
+                dispatch({ type: 'addToWishList', beer: beer })
                 setLike(true);
-            }else {
-                dispatch({type: 'removeFromWishlist', beer: beer})
+            } else {
+                toast.show({
+                    title: "Bière retirée des favorites !",
+                    status: "danger",
+                    placement: 'top',
+                })
+                dispatch({ type: 'removeFromWishlist', beer: beer })
                 setLike(false);
             }
             await fetch(`http://${IPADRESS}:3000/users/add-To-Wishlist/${beer._id}/${token}`)
-        }else{
-            navigation.navigate('StackNav', {screen: 'Log'})
+        } else {
+            navigation.navigate('StackNav', { screen: 'Log' })
         }
     }
 
@@ -214,14 +226,14 @@ export default function BeerInfo({ navigation }) {
                     <MapView
                         style={{ width: '100%', height: 200 }}
                         region={{
-                            latitude: region.coords.latitude,
-                            longitude: region.coords.longitude,
+                            latitude: currentPosition.latitude,
+                            longitude: currentPosition.longitude,
                             latitudeDelta: 0.04,
                             longitudeDelta: 0.0421,
                         }}
                     >
                         {markers}
-                        <MapView.Marker coordinate={region.coords} >
+                        <MapView.Marker coordinate={currentPosition} >
                             <View style={{ height: 15, width: 15, backgroundColor: '#737CD3', borderRadius: 50, borderWidth: 3, borderColor: "#FCFCFC" }} />
                         </MapView.Marker>
                     </MapView>

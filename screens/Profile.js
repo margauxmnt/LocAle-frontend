@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IPADRESS from '../AdressIP';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Profile({ navigation }) {
 
@@ -23,9 +24,7 @@ export default function Profile({ navigation }) {
     const [imageKey, setimageKey] = useState(1);
     
     useEffect(() => {
-        if (token === '') {
-            navigation.navigate('StackNav', { screen: 'Log' });
-        } else {
+        if (token !== '') {
             async function getUserInfos() {
                 let rawResponse = await fetch(`http://${IPADRESS}:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
@@ -41,6 +40,17 @@ export default function Profile({ navigation }) {
             }; getPermission();
         }
     }, [token]);
+
+
+    useFocusEffect(
+        React.useCallback(() => {
+            if (token.length === 0) {
+                navigation.navigate('StackNav', { screen: 'Log' });
+            }
+            return () => {  }
+        }, [token])
+    )
+
 
 
     const moreInfoBeer = async (beer) => {
@@ -93,10 +103,11 @@ export default function Profile({ navigation }) {
     const logout = () => {
         //non fonctionnel, redirige vers la home puis vers le login et ne remet pas à jour le profil
         dispatch({ type: 'addToken', token: '' })
-        dispatch({ type: 'updateWishlist', wishlist: {} })
+        dispatch({ type: 'updateWishlist', wishlist: [] })
         AsyncStorage.removeItem('userEmail');
         AsyncStorage.removeItem('userPassword');
-        navigation.navigate('StackNav', { screen: 'Homepage' })
+        setUser({});
+        navigation.navigate('StackNav', {screen: 'Homepage'})
     }
 
     // --- stars by note --- //
