@@ -52,8 +52,8 @@ export default function BeerInfo({ navigation }) {
     globalNote = Math.floor(globalNote / beerInfo.notes.length);
     for (let i = 0; i < 5; i++) {
         if (globalNote > i) {
-            stars.push(<Icon key={i} style={styles.star} name="star" size={30} color="#FAE16C" />)
-        } else stars.push(<Icon key={i} style={styles.star} name="star" size={30} color="#FEF5CB" />)
+            stars.push(<Icon key={i} style={styles.star} name="star" size={30} color="#F9D512" />)
+        } else stars.push(<Icon key={i} style={styles.star} name="star" size={30} color="#FDF0AA" />)
     }
 
 
@@ -102,8 +102,8 @@ export default function BeerInfo({ navigation }) {
                     let stars = [];
                     for (let i = 0; i < 5; i++) {
                         if (el.note > i) {
-                            stars.push(<Icon style={styles.star} name="star" size={27} color="#FAE16C" />)
-                        } else stars.push(<Icon style={styles.star} name="star" size={27} color="#FEF5CB" />)
+                            stars.push(<Icon style={styles.star} name="star" size={27} color="#F9D512" />)
+                        } else stars.push(<Icon style={styles.star} name="star" size={27} color="#FDF0AA" />)
                     }
                     return stars
                 })}
@@ -130,9 +130,9 @@ export default function BeerInfo({ navigation }) {
     const modalStars = [];
     for (let i = 0; i < 5; i++) {
         if (myRating > i)
-            modalStars.push(<Icon onPress={() => setMyRating(i + 1)} style={styles.star} name="star" size={35} color="#FAE16C" />)
+            modalStars.push(<Icon onPress={() => setMyRating(i + 1)} style={styles.star} name="star" size={35} color="#F9D512" />)
         else
-            modalStars.push(<Icon onPress={() => setMyRating(i + 1)} style={styles.star} name="star" size={35} color="#FEF5CB" />)
+            modalStars.push(<Icon onPress={() => setMyRating(i + 1)} style={styles.star} name="star" size={35} color="#FDF0AA" />)
     }
 
 
@@ -201,8 +201,8 @@ export default function BeerInfo({ navigation }) {
                     <View style={styles.infos}>
                         <View style={{ position: 'relative' }}>
                             <Image style={styles.image} source={{ uri: beerInfo.picture, }} />
-                            {!like ? <IconM onPress={() => addToWishlist(beerInfo, like)} style={styles.heart} name="heart-plus" size={30} color="#FAE16C" />
-                                : <IconM onPress={() => addToWishlist(beerInfo, like)} style={styles.heart} name="heart-plus" size={30} color="#A15640" />
+                            {!like ? <IconM onPress={() => addToWishlist(beerInfo, like)} style={styles.heart} name="heart-plus" size={30} color="#F9D512" />
+                                : <IconM onPress={() => addToWishlist(beerInfo, like)} style={styles.heart} name="heart-plus" size={30} color="#FDF0AA" />
                             }
 
                         </View>
@@ -246,7 +246,7 @@ export default function BeerInfo({ navigation }) {
                     <ScrollView nestedScrollEnabled={true} style={{ backgroundColor: '#194454', width: '100%', maxHeight: 260, padding: 10 }}>
                         {sellers.map((el, i) => (
                             <View key={i} style={styles.sellerCard} >
-                                <Icon5 style={styles.star} name="map-marker-alt" size={30} color="#FAE16C" />
+                                <Icon5 style={styles.star} name="map-marker-alt" size={30} color="#F9D512" />
                                 <Text onPress={() => setRegion({ latitude: el.latitude, longitude: el.longitude })} style={{ fontSize: 20, color: '#194454' }}>{el.name}</Text>
                                 <Text style={{ color: 'lightgrey', width: '33%' }}>{el.hours[today].openings}</Text>
                             </View>
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     badgebackground: {
         backgroundColor: '#194454',
         borderRadius: 50,
-        color: "#FAE16C",
+        color: "#F9D512",
         padding: 5,
         fontWeight: 'bold',
         fontSize: 16,

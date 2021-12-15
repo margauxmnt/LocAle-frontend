@@ -41,7 +41,7 @@ export default function CustomTabar() {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => {
           if (route.name === 'StackNav') {
-            return <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />;
+            return <Image source={require('../assets/logo_loc_ale_contour_bleufonce.png')} style={styles.logo} />;
           } else if (route.name === 'Search') {
             return <Ionicons name="search" size={35} color={color} />;
           } else if (route.name === 'Wishlist') {
@@ -52,7 +52,7 @@ export default function CustomTabar() {
         },
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#FAE16C',
+        tabBarActiveTintColor: '#F9D512',
         tabBarInactiveTintColor: '#fff',
         tabBarItemStyle: {
           backgroundColor: '#194454'

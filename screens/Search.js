@@ -65,8 +65,8 @@ function TypeaheadUsingComponentWithRenderItem(props) {
                 let stars = [];
                 if (item.note) {
                     for (let i = 0; i < 5; i++) {
-                        if (item.note > i) stars.push(<Icon name="star" color="#FAE16C" size={20} />)
-                        else stars.push(<Icon name="star" color="#FEF5CB" size={20} />)
+                        if (item.note > i) stars.push(<Icon name="star" color="#F9D512" size={20} />)
+                        else stars.push(<Icon name="star" color="#FDF0AA" size={20} />)
                     }
                 }
                 
@@ -108,7 +108,7 @@ export default function Search(props) {
                 </View>
                 <TypeaheadUsingComponentWithRenderItem navigation={props.navigation} />
                 <View style={styles.imageContainer}>
-                    <Image style={styles.logo} alt='logo' source={require('../assets/logo_matth_transparent.png')} />
+                    <Image style={styles.logo} alt='logo' source={require('../assets/logo_loc_ale_contour_bleufonce.png')} />
                 </View>
             </View>
         </NativeBaseProvider>

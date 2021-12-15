@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 40,
         marginLeft: 40,
-        color: '#FAE16C',
+        color: '#F9D512',
     },
     search: {
         flex: 1,
