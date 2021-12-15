@@ -400,6 +400,6 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#194454',
-        margin: 'auto',
+        marginRight: 100
     }
 })

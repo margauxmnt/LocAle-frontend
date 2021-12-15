@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { NativeBaseProvider, Avatar, Button, ScrollView, Image, Center, Modal, FormControl, Input } from 'native-base';
+import { NativeBaseProvider, Avatar, Button, ScrollView, Image, Center, Modal, FormControl, Input, Spinner } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
@@ -9,6 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import IPADRESS from '../AdressIP';
 import { useFocusEffect } from '@react-navigation/native';
+
 
 export default function Profile({ navigation }) {
 
@@ -23,7 +24,8 @@ export default function Profile({ navigation }) {
     const [newPseudo, setNewPseudo] = useState('');
     //update de l'avatar
     const [imageKey, setimageKey] = useState(1);
-    
+    const [loader, setLoader] = useState('none');
+
     useEffect(() => {
         if (token !== '') {
             async function getUserInfos() {
@@ -48,7 +50,7 @@ export default function Profile({ navigation }) {
             if (token.length === 0) {
                 navigation.navigate('StackNav', { screen: 'Log' });
             }
-            return () => {  }
+            return () => { }
         }, [token])
     )
 
@@ -78,9 +80,10 @@ export default function Profile({ navigation }) {
             aspect: [4, 3],
             quality: 1,
         });
+        
         if (!image.cancelled) {
 
-            let userCopy = {...user};
+            let userCopy = { ...user };
             userCopy.avatar = image.uri;
             setUser(userCopy)
 
@@ -91,13 +94,14 @@ export default function Profile({ navigation }) {
                 name: token,
             });
 
-            const request = await fetch(`http://${IPADRESS}:3000/users/update-picture/`, {
+            setLoader('flex')
+            await fetch(`http://${IPADRESS}:3000/users/update-picture/`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: data
             })
-            const result = await request.json();
-            setimageKey(prev => prev +1)
+            setLoader('none')
+
+            setimageKey(prev => prev + 1)
         }
     };
 
@@ -108,7 +112,7 @@ export default function Profile({ navigation }) {
         AsyncStorage.removeItem('userEmail');
         AsyncStorage.removeItem('userPassword');
         setUser({});
-        navigation.navigate('StackNav', {screen: 'Homepage'})
+        navigation.navigate('StackNav', { screen: 'Homepage' })
     }
 
     // --- stars by note --- //
@@ -182,6 +186,7 @@ export default function Profile({ navigation }) {
                                 source={user.avatar !== 'default' ? { uri: user.avatar } : require('../assets/logo_matth_transparent.png')}
                                 key={imageKey}
                             />
+                            <Spinner display={loader} style={styles.spinner} size='lg' color="#194454" />
                             <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                         </View>
 
@@ -218,43 +223,43 @@ export default function Profile({ navigation }) {
                         <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
                     </View>
 
-                <ScrollView>
-                    {Notes}
-                </ScrollView>
+                    <ScrollView>
+                        {Notes}
+                    </ScrollView>
 
-                <Center flex={1}>
-                    <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                        <Modal.Content maxWidth="400px">
-                            <Modal.CloseButton />
-                            <Modal.Header>Modifie tes informations de profil</Modal.Header>
-                            <Modal.Body>
-                                <FormControl>
-                                    <FormControl.Label>Nouveau pseudo</FormControl.Label>
-                                    <Input onChangeText={(v) => setNewPseudo(v)} />
-                                </FormControl>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button.Group space={2}>
-                                    <Button
-                                        style={styles.modalButton}
-                                        onPress={() => {
-                                            editPseudo();
-                                            setShowModal(false)
-                                        }}
-                                    >
-                                        <Icon5 name="check" size={30} color="#F9D512" />
-                                    </Button>
-                                </Button.Group>
-                            </Modal.Footer>
-                        </Modal.Content>
-                    </Modal>
-                </Center>
+                    <Center flex={1}>
+                        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                            <Modal.Content maxWidth="400px">
+                                <Modal.CloseButton />
+                                <Modal.Header>Modifie ton profil</Modal.Header>
+                                <Modal.Body>
+                                    <FormControl>
+                                        <FormControl.Label>Nouveau pseudo</FormControl.Label>
+                                        <Input onChangeText={(v) => setNewPseudo(v)} />
+                                    </FormControl>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button.Group space={2}>
+                                        <Button
+                                            style={styles.modalButton}
+                                            onPress={() => {
+                                                editPseudo();
+                                                setShowModal(false)
+                                            }}
+                                        >
+                                            <Icon5 name="check" size={30} color="#F9D512" />
+                                        </Button>
+                                    </Button.Group>
+                                </Modal.Footer>
+                            </Modal.Content>
+                        </Modal>
+                    </Center>
 
-            </View >
+                </View >
 
-        </NativeBaseProvider>
-    )
-    // }
+            </NativeBaseProvider>
+        )
+    }
 };
 
 const styles = StyleSheet.create({
@@ -337,6 +342,11 @@ const styles = StyleSheet.create({
     },
     modalButton: {
         backgroundColor: '#194454',
-        margin: 'auto',
+        marginRight: 100,
+    },
+    spinner: {
+        position: 'absolute',
+        top: '30%',
+        left: '30%',
     }
 })

@@ -31,6 +31,7 @@ export default function Homepage({ navigation }) {
     //brasserie sélectionnée
     const [selectedBrewerie, setSelectedBrewerie] = useState({});
     const [selectedDistance, setSelectedDistance] = useState('');
+    const [loadingImage, setLoadingImage] = useState(true)
     //ouverture des infos brasserie au clic sur celle-ci
     const { isOpen, onOpen, onClose } = useDisclose();
     //horaires d'ouverture de la brasserie en fonction du jour
@@ -40,7 +41,11 @@ export default function Homepage({ navigation }) {
     // si une brasserie est sélectionnée, on affiche le modal et on setSelectedBrewerie
     const selectedBrewerieRedux = useSelector(store => store.selectedBrewerie)
     const token = useSelector(store => store.token)
-    const wishlist = useSelector(store => store.wishlist)
+
+    // on display d'abord le logo pendant 3sec avant la homepage
+    setTimeout(() => {
+        setLoadingImage(false)
+    }, 3000)
 
 
     useEffect(() => {
@@ -151,117 +156,128 @@ export default function Homepage({ navigation }) {
         </Pressable>
     });
 
-    return (
-        // initialisation de la map et marqueur géolocalisé de l'utilisateur
-        <NativeBaseProvider>
 
-            <View style={styles.header}>
-                <Text style={styles.headerText}>{isOpen ? selectedBrewerie.name : "Loc'Ale"}</Text>
+
+    if(loadingImage){
+        return(
+            <View style={{justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: '#194454'}}>
+                <Text style={{color: "#fff", fontSize: 25, margin: 20}}>Loc'Ale</Text>
+                <Image style={{width: 200, height: 200}} source={require('../assets/logo_loc_ale_contour_bleufonce.png')} alt='logo' />
             </View>
-
-            <View style={{ flex: 1 }}>
-
-                <MapView
-                    provider={MapView.PROVIDER_GOOGLE}
-                    style={styles.container}
-                    region={region}>
-
-                    <Marker
-                        coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}>
-                        <View style={styles.localisation} />
-                    </Marker>
-
-                    {localBreweriesMarkers}
-
-                </MapView>
-
-                <Button
-                    onPress={() => navigation.navigate('Search')}
-                    leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
-                    size="lg"
-                    style={styles.search}
-                    display={isOpen ? "none" : null}
-                    _text={styles.searchText}
-                >
-                    Rechercher une bière...
-                </Button>
-
-                <View style={styles.list}>
-                    <ScrollView>
-                        {localBreweriesList}
-                    </ScrollView>
+        )
+    }else{
+        return (
+            // initialisation de la map et marqueur géolocalisé de l'utilisateur
+            <NativeBaseProvider>
+    
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>{isOpen ? selectedBrewerie.name : "Loc'Ale"}</Text>
                 </View>
-
-                <Actionsheet
-                    isOpen={isOpen}
-                    onClose={() => {
-                        onClose();
-                        setRegion({
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude,
-                            latitudeDelta: 0.1792,
-                            longitudeDelta: 0.1191,
-                        })
-                    }}
-                    hideDragIndicator>
-                    <View style={styles.distance}>
-                        <Text style={styles.distanceText}>{selectedDistance} km</Text>
+    
+                <View style={{ flex: 1 }}>
+    
+                    <MapView
+                        provider={MapView.PROVIDER_GOOGLE}
+                        style={styles.container}
+                        region={region}>
+    
+                        <Marker
+                            coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}>
+                            <View style={styles.localisation} />
+                        </Marker>
+    
+                        {localBreweriesMarkers}
+    
+                    </MapView>
+    
+                    <Button
+                        onPress={() => navigation.navigate('Search')}
+                        leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
+                        size="lg"
+                        style={styles.search}
+                        display={isOpen ? "none" : null}
+                        _text={styles.searchText}
+                    >
+                        Rechercher une bière...
+                    </Button>
+    
+                    <View style={styles.list}>
+                        <ScrollView>
+                            {localBreweriesList}
+                        </ScrollView>
                     </View>
-                    <Actionsheet.Content borderTopRadius="0" padding={0}>
-                        <Box w="100%" h={350} alignItems='center'>
-                            <Box flexDirection='row' w="100%">
-                                <AspectRatio w="34%" ratio={1 / 1}>
-                                    <Image
-                                        source={isOpen ? { uri: selectedBrewerie.pictures[0] } : null}
-                                        alt="image"
-                                    />
-                                </AspectRatio>
-                                <AspectRatio w="34%" ratio={1 / 1}>
-                                    <Image
-                                        source={isOpen ? { uri: selectedBrewerie.pictures[1] } : null}
-                                        alt="image"
-                                    />
-                                </AspectRatio>
-                                <AspectRatio w="34%" ratio={1 / 1}>
-                                    <Image
-                                        source={isOpen ? { uri: selectedBrewerie.pictures[2] } : null}
-                                        alt="image"
-                                    />
-                                </AspectRatio>
+    
+                    <Actionsheet
+                        isOpen={isOpen}
+                        onClose={() => {
+                            onClose();
+                            setRegion({
+                                latitude: location.coords.latitude,
+                                longitude: location.coords.longitude,
+                                latitudeDelta: 0.1792,
+                                longitudeDelta: 0.1191,
+                            })
+                        }}
+                        hideDragIndicator>
+                        <View style={styles.distance}>
+                            <Text style={styles.distanceText}>{selectedDistance} km</Text>
+                        </View>
+                        <Actionsheet.Content borderTopRadius="0" padding={0}>
+                            <Box w="100%" h={350} alignItems='center'>
+                                <Box flexDirection='row' w="100%">
+                                    <AspectRatio w="34%" ratio={1 / 1}>
+                                        <Image
+                                            source={isOpen ? { uri: selectedBrewerie.pictures[0] } : null}
+                                            alt="image"
+                                        />
+                                    </AspectRatio>
+                                    <AspectRatio w="34%" ratio={1 / 1}>
+                                        <Image
+                                            source={isOpen ? { uri: selectedBrewerie.pictures[1] } : null}
+                                            alt="image"
+                                        />
+                                    </AspectRatio>
+                                    <AspectRatio w="34%" ratio={1 / 1}>
+                                        <Image
+                                            source={isOpen ? { uri: selectedBrewerie.pictures[2] } : null}
+                                            alt="image"
+                                        />
+                                    </AspectRatio>
+                                </Box>
+                                <Text style={styles.beweriesDesc} >
+                                    {selectedBrewerie.description}
+                                </Text>
+                                
+                                <Button
+                                    onPress={() => {
+                                        dispatch({ type: 'selectedBrewerie', brewery: selectedBrewerie });
+                                        navigation.navigate('BeerList')
+                                    }}
+                                    style={styles.beerButton}
+                                    size="lg">
+                                    Découvrir nos bières
+                                </Button>
+                                
+                                <Ionicons
+                                    onPress={() => handleOpen(selectedBrewerie.website)}
+                                    name="earth" size={28} color="#8395a7" style={{ position: 'absolute', bottom: 10, right: 10 }} />
+                                
+                                <Text style={styles.beweriesOpening} >
+                                    {openingHours}
+                                </Text>
+                                
+                                <Text style={styles.beweriesAdress} >
+                                    {selectedBrewerie.adress}
+                                </Text>
+                    
                             </Box>
-                            <Text style={styles.beweriesDesc} >
-                                {selectedBrewerie.description}
-                            </Text>
-                            
-                            <Button
-                                onPress={() => {
-                                    dispatch({ type: 'selectedBrewerie', brewery: selectedBrewerie });
-                                    navigation.navigate('BeerList')
-                                }}
-                                style={styles.beerButton}
-                                size="lg">
-                                Découvrir nos bières
-                            </Button>
-                            
-                            <Ionicons
-                                onPress={() => handleOpen(selectedBrewerie.website)}
-                                name="earth" size={28} color="#8395a7" style={{ position: 'absolute', bottom: 10, right: 10 }} />
-                            
-                            <Text style={styles.beweriesOpening} >
-                                {openingHours}
-                            </Text>
-                            
-                            <Text style={styles.beweriesAdress} >
-                                {selectedBrewerie.adress}
-                            </Text>
-                
-                        </Box>
-                    </Actionsheet.Content>
-                </Actionsheet>
-
-            </View>
-        </NativeBaseProvider>
-    )
+                        </Actionsheet.Content>
+                    </Actionsheet>
+    
+                </View>
+            </NativeBaseProvider>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
