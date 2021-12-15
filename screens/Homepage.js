@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
+
 import { View, StyleSheet, Text } from 'react-native';
 import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Ionicons } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { useIsFocused, useFocusEffect } from '@react-navigation/native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
 import IPADRESS from '../AdressIP';
@@ -16,6 +18,7 @@ import * as Location from 'expo-location';
 
 export default function Homepage({ navigation }) {
 
+    const dispatch = useDispatch();
     //determine la location de l'utilisateur 
     const [location, setLocation] = useState({ coords: { latitude: 45.764043, longitude: 4.835659 } });
     //localisation de la map
@@ -27,7 +30,6 @@ export default function Homepage({ navigation }) {
     });
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
-    const dispatch = useDispatch();
     //brasserie sélectionnée
     const [selectedBrewerie, setSelectedBrewerie] = useState({});
     const [selectedDistance, setSelectedDistance] = useState('');
@@ -75,21 +77,19 @@ export default function Homepage({ navigation }) {
 
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries() {
-            //attention ADRESSE IP à changer en fonction
             const rawResponse = await fetch(`http://${IPADRESS}:3000/get-breweries?position=${JSON.stringify(location)}&token=${token}`);
             const response = await rawResponse.json();
             if (response) {
                 setBreweries(response.breweries);
                 dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
             };
-
         };
         searchBreweries();
     }, []);
 
 
     // quand on redirige d'une page vers la homepage, si il y a une brasserie à afficher on ouvre la modale avec la brasserie
-    // et si il n'y a rien dans le store, on ferme la modale et on ne met aucune infos sélectionée
+    // et si il n'y a rien dans le store, on ferme la modale et on ne met aucune infos sélectionnée
     useEffect(() => {
         if (selectedBrewerieRedux.length !== 0 && isFocused) {
             selectBrewerie(selectedBrewerieRedux)
@@ -155,6 +155,7 @@ export default function Homepage({ navigation }) {
         // initialisation de la map et marqueur géolocalisé de l'utilisateur
         <NativeBaseProvider>
 
+            {/* top bar */}
             <View style={styles.header}>
                 <Text style={styles.headerText}>{isOpen ? selectedBrewerie.name : "Loc'Ale"}</Text>
             </View>
@@ -175,17 +176,19 @@ export default function Homepage({ navigation }) {
 
                 </MapView>
 
+                {!isOpen ? 
                 <Button
-                    onPress={() => navigation.navigate('Search')}
-                    leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
-                    size="lg"
-                    style={styles.search}
-                    display={isOpen ? "none" : null}
-                    _text={styles.searchText}
+                onPress={() => navigation.navigate('Search')}
+                leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
+                size="lg"
+                style={styles.search}
+                _text={styles.searchText}
                 >
-                    Rechercher une bière...
+                Rechercher une bière...
                 </Button>
-
+                :
+                <View></View>}
+                
                 <View style={styles.list}>
                     <ScrollView>
                         {localBreweriesList}
@@ -203,10 +206,13 @@ export default function Homepage({ navigation }) {
                             longitudeDelta: 0.1191,
                         })
                     }}
-                    hideDragIndicator>
+                    hideDragIndicator
+                    >
+
                     <View style={styles.distance}>
                         <Text style={styles.distanceText}>{selectedDistance} km</Text>
                     </View>
+
                     <Actionsheet.Content borderTopRadius="0" padding={0}>
                         <Box w="100%" h={350} alignItems='center'>
                             <Box flexDirection='row' w="100%">
@@ -229,6 +235,7 @@ export default function Homepage({ navigation }) {
                                     />
                                 </AspectRatio>
                             </Box>
+
                             <Text style={styles.beweriesDesc} >
                                 {selectedBrewerie.description}
                             </Text>
@@ -243,10 +250,6 @@ export default function Homepage({ navigation }) {
                                 Découvrir nos bières
                             </Button>
                             
-                            <Ionicons
-                                onPress={() => handleOpen(selectedBrewerie.website)}
-                                name="earth" size={28} color="#8395a7" style={{ position: 'absolute', bottom: 10, right: 10 }} />
-                            
                             <Text style={styles.beweriesOpening} >
                                 {openingHours}
                             </Text>
@@ -254,6 +257,11 @@ export default function Homepage({ navigation }) {
                             <Text style={styles.beweriesAdress} >
                                 {selectedBrewerie.adress}
                             </Text>
+
+                            <Ionicons
+                                onPress={() => handleOpen(selectedBrewerie.website)}
+                                name="earth" size={28} color="#8395a7" style={{ position: 'absolute', bottom: 10, right: 10 }}
+                            />
                 
                         </Box>
                     </Actionsheet.Content>

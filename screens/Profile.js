@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
+
+import IPADRESS from '../AdressIP';
+
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NativeBaseProvider, Avatar, Button, ScrollView, Image, Center, Modal, FormControl, Input } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useDispatch, useSelector } from 'react-redux';
+
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import IPADRESS from '../AdressIP';
-import { useFocusEffect } from '@react-navigation/native';
+
 
 export default function Profile({ navigation }) {
 
     const dispatch = useDispatch()
     //récupération du token dans le store
     const token = useSelector(store => store.token)
-    const userNotes = useSelector(store => store.userNotes)
     //variables contenant les infos de l'utilisateur
+    const userNotes = useSelector(store => store.userNotes)
     const [user, setUser] = useState({})
     //ouverture modale pour editer le pseudo
     const [showModal, setShowModal] = useState(false)
@@ -47,10 +51,9 @@ export default function Profile({ navigation }) {
             if (token.length === 0) {
                 navigation.navigate('StackNav', { screen: 'Log' });
             }
-            return () => {  }
+            return () => { /* action quand la page n'est pas affichée */ }
         }, [token])
     )
-
 
 
     const moreInfoBeer = async (beer) => {
@@ -92,16 +95,14 @@ export default function Profile({ navigation }) {
 
             const request = await fetch(`http://${IPADRESS}:3000/users/update-picture/`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: data
             })
-            const result = await request.json();
+            await request.json();
             setimageKey(prev => prev +1)
         }
     };
 
     const logout = () => {
-        //non fonctionnel, redirige vers la home puis vers le login et ne remet pas à jour le profil
         dispatch({ type: 'addToken', token: '' })
         dispatch({ type: 'updateWishlist', wishlist: [] })
         AsyncStorage.removeItem('userEmail');
@@ -121,15 +122,15 @@ export default function Profile({ navigation }) {
         return date.toLocaleDateString('fr-FR');
     }
 
-    let Notes = [];
+    let notes = [];
     if (userNotes.length === 0) {
-        Notes.push(
+        notes.push(
             <View style={styles.card}>
                 <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
             </View>
         )
     } else {
-        Notes = userNotes.map(function (el, i) {
+        notes = userNotes.map(function (el, i) {
             return (
                 <TouchableOpacity key={i} onPress={() => moreInfoBeer(el.beer)} style={styles.card}>
                     <View>
@@ -192,7 +193,6 @@ export default function Profile({ navigation }) {
 
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
-                                <Icon name="edit" size={15} style={styles.editIcon} />
                             </View>
 
                             <Text style={{ color: '#194454', marginTop: 15 }}>
@@ -218,7 +218,7 @@ export default function Profile({ navigation }) {
                     </View>
 
                     <ScrollView>
-                        {Notes}
+                        {notes}
                     </ScrollView>
 
                     <Center flex={1}>

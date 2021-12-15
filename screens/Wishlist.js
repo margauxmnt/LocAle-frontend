@@ -14,7 +14,6 @@ export default function Wishlist({ navigation }) {
     const wishlist = useSelector(store => store.wishlist)
     const toast = useToast()
 
-
     useFocusEffect(
         React.useCallback(() => {
             if (token.length === 0) {
@@ -149,5 +148,7 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 25,
         color: '#fff',
+        fontWeight: 'bold',
+        marginTop: 35
     },
 })

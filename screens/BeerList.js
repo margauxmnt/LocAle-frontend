@@ -153,10 +153,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     icon: {
-        padding: 20,
+        paddingRight: 20,
+        paddingLeft: 20,
+        marginTop: 35
     },
     text: {
         fontSize: 25,
+        fontWeight: 'bold',
         color: '#fff',
+        marginTop: 35
     },
 });

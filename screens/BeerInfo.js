@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, Avatar, useToast } from "native-base"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import MapView, { Marker } from 'react-native-maps';
-import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, Avatar, useToast } from "native-base"
 import IPADRESS from '../AdressIP'
 
 
 export default function BeerInfo({ navigation }) {
 
+    const dispatch = useDispatch()
     const beerInfo = useSelector(store => store.beerInfo)
     const wishlist = useSelector(store => store.wishlist)
     const token = useSelector(store => store.token)
-    const dispatch = useDispatch()
     const currentPosition = useSelector(store => store.location)
 
     const [sellers, setSellers] = useState([]);
@@ -35,9 +37,9 @@ export default function BeerInfo({ navigation }) {
         }
         getSellers();
 
-        wishlist.forEach(e => { if (e._id === beerInfo._id) setLike(true) })
+        wishlist.forEach(e => { if (e._id === beerInfo._id) setLike(true) });
 
-        setimageKey(prev => prev +1)
+        setimageKey(prev => prev +1);
 
     }, [beerInfo])
 
@@ -150,9 +152,10 @@ export default function BeerInfo({ navigation }) {
                 body: `comment=${myComment}&note=${myRating}&token=${token}&beerId=${beerInfo._id}`
             })
             const result = await request.json()
-
+            
             dispatch({ type: 'addBeerNote', note: result.saveNote })
             dispatch({ type: 'addUserNote', userNote: result.saveNote, beer: result.beer })
+            
         } else {
             navigation.navigate('StackNav', { screen: 'Log' })
         }
@@ -224,6 +227,7 @@ export default function BeerInfo({ navigation }) {
                     </View>
                     <Text style={{ fontSize: 25, fontWeight: 'bold', color: '#194454', margin: 10 }}>Où puis-je la trouver ?</Text>
                     <MapView
+                        provider={MapView.PROVIDER_GOOGLE}
                         style={{ width: '100%', height: 200 }}
                         region={{
                             latitude: currentPosition.latitude,
@@ -231,10 +235,10 @@ export default function BeerInfo({ navigation }) {
                             latitudeDelta: 0.04,
                             longitudeDelta: 0.0421,
                         }}
-                    >
+                        >
                         {markers}
                         <MapView.Marker coordinate={currentPosition} >
-                            <View style={{ height: 15, width: 15, backgroundColor: '#737CD3', borderRadius: 50, borderWidth: 3, borderColor: "#FCFCFC" }} />
+                            <View style={styles.localisation} />
                         </MapView.Marker>
                     </MapView>
 
@@ -313,12 +317,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
     },
+    icon: {
+        paddingRight: 20,
+        paddingLeft: 20,
+        marginTop: 35
+    },
     text: {
         fontSize: 25,
+        fontWeight: 'bold',
         color: '#fff',
-    },
-    icon: {
-        padding: 20,
+        marginTop: 35
     },
     image: {
         width: 130,
@@ -362,6 +370,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 10,
     },
+    localisation: {
+        height: 25,
+        width: 25,
+        backgroundColor: '#737CD3',
+        borderRadius: 50,
+        borderStyle: 'solid',
+        borderColor: '#FFFFFF',
+        borderWidth: 4
+    },
     star: {
         marginRight: 5,
     },
@@ -397,6 +414,7 @@ const styles = StyleSheet.create({
     cardInfo: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        maxWidth: '50%'
     },
     button: {
         backgroundColor: '#194454',
