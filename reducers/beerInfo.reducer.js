@@ -4,7 +4,7 @@ export default function(beerInfo = {}, action){
     }
     else if(action.type === 'addBeerNote'){
         const beer = {...beerInfo}
-        beer.notes.push(action.note)
+        beer.notes.unshift(action.note)
         return beer
     }
     else return beerInfo

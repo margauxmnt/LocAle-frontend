@@ -1,34 +1,40 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
+
+import IPADRESS from '../AdressIP';
+
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { NativeBaseProvider, Avatar, Button, ScrollView, Image, Center, Modal, FormControl, Input } from 'native-base';
+import { NativeBaseProvider, Avatar, Button, ScrollView, Image, Center, Modal, FormControl, Input, Spinner } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useDispatch, useSelector } from 'react-redux';
+import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import IPADRESS from '../AdressIP';
-import { useFocusEffect } from '@react-navigation/native';
+
+
 
 export default function Profile({ navigation }) {
 
     const dispatch = useDispatch()
     //récupération du token dans le store
     const token = useSelector(store => store.token)
-    const userNotes = useSelector(store => store.userNotes)
     //variables contenant les infos de l'utilisateur
+    const userNotes = useSelector(store => store.userNotes)
     const [user, setUser] = useState({})
     //ouverture modale pour editer le pseudo
     const [showModal, setShowModal] = useState(false)
     const [newPseudo, setNewPseudo] = useState('');
+    //update de l'avatar
+    const [imageKey, setimageKey] = useState(1);
+    const [loader, setLoader] = useState('none');
 
     useEffect(() => {
         if (token !== '') {
             async function getUserInfos() {
-                //attention ADRESSE IP à changer en fonction
                 let rawResponse = await fetch(`http://${IPADRESS}:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
                 setUser(response.user)
-
                 dispatch({ type: 'updateNotes', userNotes: response.userNotes })
             }; getUserInfos();
 
@@ -38,7 +44,7 @@ export default function Profile({ navigation }) {
                     alert('Sorry, we need camera roll permissions to make this work!');
                 }
             }; getPermission();
-        } 
+        }
     }, [token]);
 
 
@@ -47,10 +53,9 @@ export default function Profile({ navigation }) {
             if (token.length === 0) {
                 navigation.navigate('StackNav', { screen: 'Log' });
             }
-            return () => {  }
+            return () => { /* action quand la page n'est pas affichée */ }
         }, [token])
     )
-
 
 
     const moreInfoBeer = async (beer) => {
@@ -77,26 +82,38 @@ export default function Profile({ navigation }) {
             aspect: [4, 3],
             quality: 1,
         });
+        
         if (!image.cancelled) {
 
-            const request = await fetch(`http://${IPADRESS}:3000/users/update-picture`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `avatar=${image.uri}&token=${token}`
-            })
-            const result = await request.json()
+            let userCopy = { ...user };
+            userCopy.avatar = image.uri;
+            setUser(userCopy)
 
+            var data = new FormData();
+            data.append('avatar', {
+                uri: image.uri,
+                type: 'image/jpeg',
+                name: token,
+            });
+
+            setLoader('flex')
+            await fetch(`http://${IPADRESS}:3000/users/update-picture/`, {
+                method: 'POST',
+                body: data
+            })
+            setLoader('none')
+
+            setimageKey(prev => prev + 1)
         }
     };
 
     const logout = () => {
-        //non fonctionnel, redirige vers la home puis vers le login et ne remet pas à jour le profil
         dispatch({ type: 'addToken', token: '' })
         dispatch({ type: 'updateWishlist', wishlist: [] })
         AsyncStorage.removeItem('userEmail');
         AsyncStorage.removeItem('userPassword');
         setUser({});
-        navigation.popToTop('StackNav')
+        navigation.navigate('StackNav', { screen: 'Homepage' })
     }
 
     // --- stars by note --- //
@@ -104,23 +121,28 @@ export default function Profile({ navigation }) {
         return s();
     }
 
+    //format date
+    let dateFormat = (el) => {
+        let date = new Date(el);
+        return date.toLocaleDateString('fr-FR');
+    }
 
-    let Notes = [];
+    let notes = [];
     if (userNotes.length === 0) {
-        Notes.push(
+        notes.push(
             <View style={styles.card}>
                 <Text style={{ color: '#194454' }}>Vous n'avez pas encore laissé de notes ou commentaires</Text>
             </View>
         )
     } else {
-        Notes = userNotes.map(function (el, i) {
+        notes = userNotes.map(function (el, i) {
             return (
                 <TouchableOpacity key={i} onPress={() => moreInfoBeer(el.beer)} style={styles.card}>
                     <View>
                         <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
                     </View>
                     <View style={{ marginLeft: 10, width: '75%' }}>
-                        <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                        <Text style={{ color: '#194454', fontSize: 11 }}>{dateFormat(el.date)}</Text>
                         <View style={{ alignItems: 'center' }}>
                             <View style={styles.starContainer}>
                                 {starByNote(() => {
@@ -141,98 +163,103 @@ export default function Profile({ navigation }) {
         })
     }
 
+    if (user.avatar === undefined) {
+        return (
+            <View></View>
+        )
+    } else {
+        return (
+            <NativeBaseProvider>
 
-    return (
-        <NativeBaseProvider>
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>Mon compte</Text>
+                </View>
 
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Mon compte</Text>
-            </View>
+                <View style={styles.container} >
 
-            <View style={styles.container} >
+                    <Ionicons onPress={() => logout()} style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
 
-                <Ionicons onPress={() => logout()} style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
+                    <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
 
-                <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
-
-                    <View style={{ flexDirection: 'row' }}>
-                        <Avatar
-                            size="xl"
-                            source={user.avatar !== 'default' ? user.avatar : require('../assets/logo_matth_transparent.png')}
-                        />
-                        <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
-                    </View>
-
-                    <View style={styles.userInfos}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ color: '#194454', fontSize: 20 }}>{newPseudo !== '' ? newPseudo : user.pseudo}</Text>
-                            <Icon onPress={() => setShowModal(true)} name="edit" size={15} style={styles.editIcon} />
+                        <View style={{ flexDirection: 'row' }}>
+                            <Avatar
+                                size="xl"
+                                source={user.avatar !== 'default' ? { uri: user.avatar } : require('../assets/logo_matth_transparent.png')}
+                                key={imageKey}
+                            />
+                            <Spinner display={loader} style={styles.spinner} size='lg' color="#194454" />
+                            <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                         </View>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
-                            <Icon name="edit" size={15} style={styles.editIcon} />
+                        <View style={styles.userInfos}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', fontSize: 20 }}>{newPseudo !== '' ? newPseudo : user.pseudo}</Text>
+                                <Icon onPress={() => setShowModal(true)} name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
+                            </View>
+
+                            <Text style={{ color: '#194454', marginTop: 15 }}>
+                                Date inscription: {dateFormat(user.insert_date)}
+                            </Text>
                         </View>
-
-                        <Text style={{ color: '#194454', marginTop: 15 }}>
-                            Date inscription: 12/12/2012
-                        </Text>
                     </View>
-                </View>
 
-                <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
-                    <Button
-                        onPress={() => navigation.navigate('Wishlist')}
-                        style={styles.toWishlist}
-                        size="lg"
-                        leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
-                        _text={{ fontSize: 20 }}
-                    >
-                        Mes Favorites
-                    </Button>
-                </View>
+                    <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
+                        <Button
+                            onPress={() => navigation.navigate('Wishlist')}
+                            style={styles.toWishlist}
+                            size="lg"
+                            leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
+                            _text={{ fontSize: 20 }}
+                        >
+                            Mes Favorites
+                        </Button>
+                    </View>
 
-                <View style={styles.headerNotes}>
-                    <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
-                </View>
+                    <View style={styles.headerNotes}>
+                        <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
+                    </View>
 
-                <ScrollView>
-                    {Notes}
-                </ScrollView>
+                    <ScrollView>
+                        {notes}
+                    </ScrollView>
 
-                <Center flex={1}>
-                    <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                        <Modal.Content maxWidth="400px">
-                            <Modal.CloseButton />
-                            <Modal.Header>Modifie tes informations de profil</Modal.Header>
-                            <Modal.Body>
-                                <FormControl>
-                                    <FormControl.Label>Nouveau pseudo</FormControl.Label>
-                                    <Input onChangeText={(v) => setNewPseudo(v)} />
-                                </FormControl>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button.Group space={2}>
-                                    <Button
-                                        style={styles.modalButton}
-                                        onPress={() => {
-                                            editPseudo();
-                                            setShowModal(false)
-                                        }}
-                                    >
-                                        Valider
-                                    </Button>
-                                </Button.Group>
-                            </Modal.Footer>
-                        </Modal.Content>
-                    </Modal>
-                </Center>
+                    <Center flex={1}>
+                        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                            <Modal.Content maxWidth="400px">
+                                <Modal.CloseButton />
+                                <Modal.Header>Modifie ton profil</Modal.Header>
+                                <Modal.Body>
+                                    <FormControl>
+                                        <FormControl.Label>Nouveau pseudo</FormControl.Label>
+                                        <Input onChangeText={(v) => setNewPseudo(v)} />
+                                    </FormControl>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button.Group space={2}>
+                                        <Button
+                                            style={styles.modalButton}
+                                            onPress={() => {
+                                                editPseudo();
+                                                setShowModal(false)
+                                            }}
+                                        >
+                                            <Icon5 name="check" size={30} color="#F9D512" />
+                                        </Button>
+                                    </Button.Group>
+                                </Modal.Footer>
+                            </Modal.Content>
+                        </Modal>
+                    </Center>
 
-            </View >
+                </View >
 
-        </NativeBaseProvider>
-    )
-    // }
+            </NativeBaseProvider>
+        )
+    }
 };
 
 const styles = StyleSheet.create({
@@ -315,6 +342,11 @@ const styles = StyleSheet.create({
     },
     modalButton: {
         backgroundColor: '#194454',
-        margin: 'auto',
+        marginRight: 100,
+    },
+    spinner: {
+        position: 'absolute',
+        top: '30%',
+        left: '30%',
     }
 })

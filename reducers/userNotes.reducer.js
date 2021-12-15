@@ -3,7 +3,7 @@ export default function(userNotes = [], action){
     else if(action.type === 'addUserNote'){
         let note = action.userNote
         note.beer = action.beer
-        const newN = [...userNotes]
+        let newN = [...userNotes]
         newN.unshift(note)
         return newN
     }

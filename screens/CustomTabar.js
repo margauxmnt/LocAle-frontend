@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
@@ -28,6 +28,14 @@ const StackNavigator = () => {
 const Tab = createBottomTabNavigator();
 
 export default function CustomTabar() {
+
+  const [tabDisplay, setTabDisplay] = useState('none');
+
+  // on display none la tabbar pendant 3sec au démarrage
+  setTimeout(() => {
+    setTabDisplay('flex');
+  }, 3000)
+  
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -50,6 +58,7 @@ export default function CustomTabar() {
           backgroundColor: '#194454'
         },
         tabBarStyle: {
+          display: tabDisplay,
           backgroundColor: '#194454'
         },
 
