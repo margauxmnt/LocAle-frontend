@@ -188,7 +188,7 @@ export default function Log({ navigation }) {
             <View style={{ display: display, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
 
                 <View>
-                    <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
+                    <Image source={require('../assets/logo_loc_ale_contour_bleufonce.png')} style={styles.logo} />
                 </View>
 
                 <View>
@@ -218,7 +218,7 @@ export default function Log({ navigation }) {
             <View style={{ display: displayTwo, height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
 
                 <View>
-                    <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
+                    <Image source={require('../assets/logo_loc_ale_contour_bleufonce.png')} style={styles.logo} />
                 </View>
 
                 <Text style={{ color: '#e63946' }}>{errorSignup}</Text>
@@ -249,7 +249,7 @@ export default function Log({ navigation }) {
             <View style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#194454' }}>
 
                 <View>
-                    <Image source={require('../assets/logo_matth_transparent.png')} style={styles.logo} />
+                    <Image source={require('../assets/logo_loc_ale_contour_bleufonce.png')} style={styles.logo} />
                 </View>
 
                 <Text style={{ color: '#e63946' }}>{errorSignin}</Text>

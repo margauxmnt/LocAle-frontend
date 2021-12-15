@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     backgroundIcone: {
-        backgroundColor: "#FAE16C",
+        backgroundColor: "#F9D512",
         borderRadius: 50,
     },
     note: {

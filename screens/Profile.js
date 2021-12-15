@@ -127,8 +127,8 @@ export default function Profile({ navigation }) {
                                     let stars = [];
                                     for (let i = 0; i < 5; i++) {
                                         if (el.note > i) {
-                                            stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FAE16C" />)
-                                        } else stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FEF5CB" />)
+                                            stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#F9D512" />)
+                                        } else stars.push(<Icon key={i} style={styles.star} name="star" size={27} color="#FDF0AA" />)
                                     }
                                     return stars
                                 })}
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
         top: 6
     },
     toWishlist: {
-        backgroundColor: '#FAE16C',
+        backgroundColor: '#F9D512',
         borderRadius: 50,
         width: '60%',
     },

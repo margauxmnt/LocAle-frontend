@@ -7,11 +7,11 @@ import IconI from 'react-native-vector-icons/AntDesign';
 export default function BeerCard(props) {
 
     let isInWishlist = props.isInWishlist;
-    let color = isInWishlist ? '#A15640' : '#FAE16C'
+    let color = isInWishlist ? '#A15640' : '#F9D512'
 
     const manageWishlist = () => {
         props.addToWishlist(props.beer, !isInWishlist);
-        color === '#A15640' ? color = '#FAE16C' : color = '#A15640';
+        color === '#A15640' ? color = '#F9D512' : color = '#A15640';
     }
 
     const starByNote = (s) => {
@@ -52,8 +52,8 @@ export default function BeerCard(props) {
                         let stars = [];
                         for (let i = 0; i < 5; i++) {
                             if (globalNote > i) {
-                                stars.push(<Icon key={i} style={{ marginRight: 2 }} name="star" size={25} color="#FAE16C" />)
-                            } else stars.push(<Icon key={i} style={{ marginRight: 2 }} name="star" size={25} color="#FEF5CB" />)
+                                stars.push(<Icon key={i} style={{ marginRight: 2 }} name="star" size={25} color="#F9D512" />)
+                            } else stars.push(<Icon key={i} style={{ marginRight: 2 }} name="star" size={25} color="#FDF0AA" />)
                         }
                         return stars
                     })}
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     backgroundIcone: {
-        backgroundColor: "#FAE16C",
+        backgroundColor: "#F9D512",
         borderRadius: 50,
     },
     iconeI: {

@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 40,
         marginLeft: 40,
-        color: '#FAE16C',
+        color: '#F9D512',
     },
     search: {
         flex: 1,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
         width: '90%'
     },
     beerButton: {
-        backgroundColor: '#FAE16C',
+        backgroundColor: '#F9D512',
         borderRadius: 50,
     },
     beweriesOpening: {
