@@ -91,7 +91,7 @@ function TypeaheadUsingComponentWithRenderItem(props) {
                 );
             }}
             toggleIcon={({ isOpen }) => {
-                return isOpen ? <Icon /> : <Icon name="search" style={styles.icon} size={35} color="#8395a7" />;
+                return isOpen ? <Icon /> : <Icon name="search" style={styles.icon} size={30} color="#8395a7" />;
             }}
         />
     );
@@ -128,14 +128,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     text: {
-        fontSize: 35,
+        fontSize: 25,
         fontWeight: 'bold',
         color: "#fff",
+        marginTop: 35
     },
     icon: {
         marginRight: '90%',
-        marginTop: 5, 
-        marginBottom: 5
+        marginTop: 8,
+        marginBottom: 8
     },
     typeAhead: {
         backgroundColor: 'red'

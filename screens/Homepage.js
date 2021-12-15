@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
+
 import { View, StyleSheet, Text } from 'react-native';
 import { NativeBaseProvider, ScrollView, Box, Heading, Button, Actionsheet, useDisclose, Pressable, Image, AspectRatio } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Ionicons } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { useIsFocused, useFocusEffect } from '@react-navigation/native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
 import IPADRESS from '../AdressIP';
@@ -16,6 +18,7 @@ import * as Location from 'expo-location';
 
 export default function Homepage({ navigation }) {
 
+    const dispatch = useDispatch();
     //determine la location de l'utilisateur 
     const [location, setLocation] = useState({ coords: { latitude: 45.764043, longitude: 4.835659 } });
     //localisation de la map
@@ -27,7 +30,6 @@ export default function Homepage({ navigation }) {
     });
     //tableaux contenants les brasseries
     const [breweries, setBreweries] = useState([]);
-    const dispatch = useDispatch();
     //brasserie sélectionnée
     const [selectedBrewerie, setSelectedBrewerie] = useState({});
     const [selectedDistance, setSelectedDistance] = useState('');
@@ -72,29 +74,28 @@ export default function Homepage({ navigation }) {
             if (status == 'granted') {
                 // si géolocalisation autorisée, on récupère la localisation de l'utilisateur et on met à jour la variable d'état correspondante
                 await Location.watchPositionAsync({ distanceInterval: 10 },
-                    (loc) => { 
-                        setLocation(loc); 
-                        dispatch({ type: 'userLocalisation', location: loc }) });
+                    (loc) => {
+                        setLocation(loc);
+                        dispatch({ type: 'userLocalisation', location: loc })
+                    });
             }
         } askPermission();
 
         //envoi de la position au backend et récuperation des brasseries autour de l'utilisateur à l'initiatlisation du composant 
         async function searchBreweries() {
-            //attention ADRESSE IP à changer en fonction
             const rawResponse = await fetch(`http://${IPADRESS}:3000/get-breweries?position=${JSON.stringify(location)}&token=${token}`);
             const response = await rawResponse.json();
             if (response) {
                 setBreweries(response.breweries);
                 dispatch({ type: 'addLocalBreweries', newBreweries: response.breweries });
             };
-
         };
         searchBreweries();
     }, []);
 
 
     // quand on redirige d'une page vers la homepage, si il y a une brasserie à afficher on ouvre la modale avec la brasserie
-    // et si il n'y a rien dans le store, on ferme la modale et on ne met aucune infos sélectionée
+    // et si il n'y a rien dans le store, on ferme la modale et on ne met aucune infos sélectionnée
     useEffect(() => {
         if (selectedBrewerieRedux.length !== 0 && isFocused) {
             selectBrewerie(selectedBrewerieRedux)
@@ -158,55 +159,59 @@ export default function Homepage({ navigation }) {
 
 
 
-    if(loadingImage){
-        return(
-            <View style={{justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: '#194454'}}>
-                <Text style={{color: "#fff", fontSize: 25, margin: 20}}>Loc'Ale</Text>
-                <Image style={{width: 200, height: 200}} source={require('../assets/logo_loc_ale_contour_bleufonce.png')} alt='logo' />
+    if (loadingImage) {
+        return (
+            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: '#194454' }}>
+                <Text style={{ color: "#fff", fontSize: 25, margin: 20 }}>Loc'Ale</Text>
+                <Image style={{ width: 200, height: 200 }} source={require('../assets/logo_loc_ale_contour_bleufonce.png')} alt='logo' />
             </View>
         )
-    }else{
+    } else {
         return (
             // initialisation de la map et marqueur géolocalisé de l'utilisateur
             <NativeBaseProvider>
-    
+
                 <View style={styles.header}>
                     <Text style={styles.headerText}>{isOpen ? selectedBrewerie.name : "Loc'Ale"}</Text>
                 </View>
-    
+
                 <View style={{ flex: 1 }}>
-    
+
                     <MapView
                         provider={MapView.PROVIDER_GOOGLE}
                         style={styles.container}
                         region={region}>
-    
+
                         <Marker
                             coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}>
                             <View style={styles.localisation} />
                         </Marker>
-    
+
                         {localBreweriesMarkers}
-    
+
                     </MapView>
-    
-                    <Button
-                        onPress={() => navigation.navigate('Search')}
-                        leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
-                        size="lg"
-                        style={styles.search}
-                        display={isOpen ? "none" : null}
-                        _text={styles.searchText}
-                    >
-                        Rechercher une bière...
-                    </Button>
-    
+
+                    {!isOpen ?
+                        <Button
+                            onPress={() => navigation.navigate('Search')}
+                            leftIcon={<Icon name="search" size={30} color={'#8395a7'} />}
+                            size="lg"
+                            style={styles.search}
+                            display={isOpen ? "none" : null}
+                            _text={styles.searchText}
+                        >
+                            Rechercher une bière...
+                        </Button> :
+                        <View/>
+                    }
+
+
                     <View style={styles.list}>
                         <ScrollView>
                             {localBreweriesList}
                         </ScrollView>
                     </View>
-    
+
                     <Actionsheet
                         isOpen={isOpen}
                         onClose={() => {
@@ -247,7 +252,7 @@ export default function Homepage({ navigation }) {
                                 <Text style={styles.beweriesDesc} >
                                     {selectedBrewerie.description}
                                 </Text>
-                                
+
                                 <Button
                                     onPress={() => {
                                         dispatch({ type: 'selectedBrewerie', brewery: selectedBrewerie });
@@ -257,23 +262,23 @@ export default function Homepage({ navigation }) {
                                     size="lg">
                                     Découvrir nos bières
                                 </Button>
-                                
+
                                 <Ionicons
                                     onPress={() => handleOpen(selectedBrewerie.website)}
                                     name="earth" size={28} color="#8395a7" style={{ position: 'absolute', bottom: 10, right: 10 }} />
-                                
+
                                 <Text style={styles.beweriesOpening} >
                                     {openingHours}
                                 </Text>
-                                
+
                                 <Text style={styles.beweriesAdress} >
                                     {selectedBrewerie.adress}
                                 </Text>
-                    
+
                             </Box>
                         </Actionsheet.Content>
                     </Actionsheet>
-    
+
                 </View>
             </NativeBaseProvider>
         )
@@ -362,7 +367,7 @@ const styles = StyleSheet.create({
         width: '90%'
     },
     beerButton: {
-        backgroundColor: '#F9D512', 
+        backgroundColor: '#F9D512',
         borderRadius: 50,
         margin: 5
     },
