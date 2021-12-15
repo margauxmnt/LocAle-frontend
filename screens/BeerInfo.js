@@ -120,7 +120,7 @@ export default function BeerInfo({ navigation }) {
                         </View>
                         <Text style={{ width: 100, color: '#194454' }}>{el.owner.pseudo}</Text>
                     </View>
-                    <Text style={{ color: '#194454', fontSize: 11 }}>{dateFormat(el.date)}</Text>
+                    <Text style={{ color: '#194454', fontSize: 11, position: 'absolute', left: 120 }}>{dateFormat(el.date)}</Text>
                 </View>
                 <Text style={{ width: 180, color: '#194454', fontWeight: 'bold', textAlign: 'center' }}>{el.comment}</Text>
             </View>
