@@ -18,7 +18,7 @@ export default function BeerInfo({ navigation }) {
     const currentPosition = useSelector(store => store.location)
 
     const [sellers, setSellers] = useState([]);
-    // const [region, setRegion] = useState([])
+    const [region, setRegion] = useState([])
     const [showModal, setShowModal] = useState(false)
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');

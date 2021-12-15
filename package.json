@@ -25,6 +25,7 @@
     "expo-linking": "~2.4.2",
     "expo-location": "^13.0.4",
     "expo-status-bar": "~1.1.0",
+    "expo-web-browser": "~10.0.3",
     "native-base": "^3.2.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -40,8 +41,7 @@
     "react-native-vector-icons": "^9.0.0",
     "react-native-web": "0.17.1",
     "react-redux": "^7.2.6",
-    "redux": "^4.1.2",
-    "expo-web-browser": "~10.0.3"
+    "redux": "^4.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
