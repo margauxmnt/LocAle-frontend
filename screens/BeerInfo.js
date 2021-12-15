@@ -270,7 +270,7 @@ export default function BeerInfo({ navigation }) {
                                             setShowModal(false)
                                         }}
                                     >
-                                        Ajouter
+                                        <Icon5 name="check" size={30} color="#F9D512" />
                                     </Button>
                                 </Button.Group>
                             </Modal.Footer>
