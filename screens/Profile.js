@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NativeBaseProvider, Avatar, Button, ScrollView, Image, Center, Modal, FormControl, Input } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch, useSelector } from 'react-redux';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -78,14 +79,13 @@ export default function Profile({ navigation }) {
             quality: 1,
         });
         if (!image.cancelled) {
-
+            console.log(image.uri)
             const request = await fetch(`http://${IPADRESS}:3000/users/update-picture`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `avatar=${image.uri}&token=${token}`
             })
             const result = await request.json()
-
         }
     };
 
@@ -220,7 +220,7 @@ export default function Profile({ navigation }) {
                                             setShowModal(false)
                                         }}
                                     >
-                                        Valider
+                                        <Icon5 name="check" size={30} color="#F9D512" />
                                     </Button>
                                 </Button.Group>
                             </Modal.Footer>
