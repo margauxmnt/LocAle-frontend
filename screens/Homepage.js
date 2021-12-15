@@ -28,6 +28,7 @@ export default function Homepage({ navigation }) {
     const dispatch = useDispatch();
     //brasserie sélectionnée
     const [selectedBrewerie, setSelectedBrewerie] = useState({});
+    const [selectedDistance, setSelectedDistance] = useState('');
     //ouverture des infos brasserie au clic sur celle-ci
     const { isOpen, onOpen, onClose } = useDisclose();
     //horaires d'ouverture de la brasserie en fonction du jour
@@ -100,7 +101,8 @@ export default function Homepage({ navigation }) {
 
     //enregistrement de la brasserie sélectionnée et ouverture de la pop up avec les infos de celle ci
     //récupération du jour pour afficher les horaires du jour de la brasserie sélectionnée
-    let selectBrewerie = (brewerie) => {
+    let selectBrewerie = (brewerie, distance) => {
+        setSelectedDistance(distance.toFixed(1))
         setSelectedBrewerie(brewerie);
         onOpen();
         let date = new Date();
@@ -117,7 +119,7 @@ export default function Homepage({ navigation }) {
     let localBreweriesMarkers = breweries.map(function (breweries, i) {
         return <Marker
             key={i}
-            onPress={() => selectBrewerie(breweries.brewerie)}
+            onPress={() => selectBrewerie(breweries.brewerie, breweries.distance)}
             coordinate={{ latitude: breweries.brewerie.latitude, longitude: breweries.brewerie.longitude }}>
             <Icon name='map-marker' size={35} color={'#194454'} />
         </Marker>
@@ -125,7 +127,7 @@ export default function Homepage({ navigation }) {
 
     //création de la liste des brasseries
     let localBreweriesList = breweries.map(function (breweries, i) {
-        return <Pressable key={i} onPress={() => selectBrewerie(breweries.brewerie)}>
+        return <Pressable key={i} onPress={() => selectBrewerie(breweries.brewerie, breweries.distance)}>
             <Box
                 rounded="lg"
                 borderColor="#194454"
@@ -197,7 +199,7 @@ export default function Homepage({ navigation }) {
                     }}
                     hideDragIndicator>
                     <View style={styles.distance}>
-                        <Text style={styles.distanceText}>12 km</Text>
+                        <Text style={styles.distanceText}>{selectedDistance} km</Text>
                     </View>
                     <Actionsheet.Content borderTopRadius="0" padding={0}>
                         <Box w="100%" h={350} alignItems='center'>
