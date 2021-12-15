@@ -27,7 +27,7 @@ export default function Profile({ navigation }) {
     const [newPseudo, setNewPseudo] = useState('');
     //update de l'avatar
     const [imageKey, setimageKey] = useState(1);
-    const [loader, setLoader] = useState('none');
+    //const [loader, setLoader] = useState('none');
 
     useEffect(() => {
         if (token !== '') {
@@ -96,12 +96,12 @@ export default function Profile({ navigation }) {
                 name: token,
             });
 
-            setLoader('flex')
+            // setLoader('flex')
             await fetch(`http://${IPADRESS}:3000/users/update-picture/`, {
                 method: 'POST',
                 body: data
-            })
-            setLoader('none')
+            });
+            // setLoader('none')
 
             setimageKey(prev => prev + 1)
         }
@@ -187,7 +187,7 @@ export default function Profile({ navigation }) {
                                 source={user.avatar !== 'default' ? { uri: user.avatar } : require('../assets/logo_matth_transparent.png')}
                                 key={imageKey}
                             />
-                            <Spinner display={loader} style={styles.spinner} size='lg' color="#194454" />
+                            {/* <Spinner display={loader} style={styles.spinner} size='lg' color="#194454" /> */}
                             <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                         </View>
 
