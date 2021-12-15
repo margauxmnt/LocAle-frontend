@@ -21,15 +21,15 @@ export default function Profile({ navigation }) {
     //ouverture modale pour editer le pseudo
     const [showModal, setShowModal] = useState(false)
     const [newPseudo, setNewPseudo] = useState('');
-
+    //update de l'avatar
+    const [imageKey, setimageKey] = useState(1);
+    
     useEffect(() => {
         if (token !== '') {
             async function getUserInfos() {
-                //attention ADRESSE IP à changer en fonction
                 let rawResponse = await fetch(`http://${IPADRESS}:3000/users/get-user-infos?token=${token}`);
                 let response = await rawResponse.json();
                 setUser(response.user)
-
                 dispatch({ type: 'updateNotes', userNotes: response.userNotes })
             }; getUserInfos();
 
@@ -39,7 +39,7 @@ export default function Profile({ navigation }) {
                     alert('Sorry, we need camera roll permissions to make this work!');
                 }
             }; getPermission();
-        } 
+        }
     }, [token]);
 
 
@@ -79,13 +79,25 @@ export default function Profile({ navigation }) {
             quality: 1,
         });
         if (!image.cancelled) {
-            console.log(image.uri)
-            const request = await fetch(`http://${IPADRESS}:3000/users/update-picture`, {
+
+            let userCopy = {...user};
+            userCopy.avatar = image.uri;
+            setUser(userCopy)
+
+            var data = new FormData();
+            data.append('avatar', {
+                uri: image.uri,
+                type: 'image/jpeg',
+                name: token,
+            });
+
+            const request = await fetch(`http://${IPADRESS}:3000/users/update-picture/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `avatar=${image.uri}&token=${token}`
+                body: data
             })
-            const result = await request.json()
+            const result = await request.json();
+            setimageKey(prev => prev +1)
         }
     };
 
@@ -104,6 +116,11 @@ export default function Profile({ navigation }) {
         return s();
     }
 
+    //format date
+    let dateFormat = (el) => {
+        let date = new Date(el);
+        return date.toLocaleDateString('fr-FR');
+    }
 
     let Notes = [];
     if (userNotes.length === 0) {
@@ -120,7 +137,7 @@ export default function Profile({ navigation }) {
                         <Image style={styles.beerImage} source={{ uri: el.beer.picture }} alt='Image' />
                     </View>
                     <View style={{ marginLeft: 10, width: '75%' }}>
-                        <Text style={{ color: '#194454', fontSize: 11 }}>Date</Text>
+                        <Text style={{ color: '#194454', fontSize: 11 }}>{dateFormat(el.date)}</Text>
                         <View style={{ alignItems: 'center' }}>
                             <View style={styles.starContainer}>
                                 {starByNote(() => {
@@ -141,60 +158,65 @@ export default function Profile({ navigation }) {
         })
     }
 
+    if (user.avatar === undefined) {
+        return (
+            <View></View>
+        )
+    } else {
+        return (
+            <NativeBaseProvider>
 
-    return (
-        <NativeBaseProvider>
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>Mon compte</Text>
+                </View>
 
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Mon compte</Text>
-            </View>
+                <View style={styles.container} >
 
-            <View style={styles.container} >
+                    <Ionicons onPress={() => logout()} style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
 
-                <Ionicons onPress={() => logout()} style={styles.logOut} name="log-out-outline" size={30} color="#8395a7" />
+                    <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
 
-                <View style={{ flexDirection: "row", justifyContent: 'space-around' }}>
-
-                    <View style={{ flexDirection: 'row' }}>
-                        <Avatar
-                            size="xl"
-                            source={user.avatar !== 'default' ? user.avatar : require('../assets/logo_matth_transparent.png')}
-                        />
-                        <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
-                    </View>
-
-                    <View style={styles.userInfos}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ color: '#194454', fontSize: 20 }}>{newPseudo !== '' ? newPseudo : user.pseudo}</Text>
-                            <Icon onPress={() => setShowModal(true)} name="edit" size={15} style={styles.editIcon} />
+                        <View style={{ flexDirection: 'row' }}>
+                            <Avatar
+                                size="xl"
+                                source={user.avatar !== 'default' ? { uri: user.avatar } : require('../assets/logo_matth_transparent.png')}
+                                key={imageKey}
+                            />
+                            <Icon onPress={pickImage} name="edit" size={15} color={'#194454'} style={styles.editAvatar} />
                         </View>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
-                            <Icon name="edit" size={15} style={styles.editIcon} />
+                        <View style={styles.userInfos}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', fontSize: 20 }}>{newPseudo !== '' ? newPseudo : user.pseudo}</Text>
+                                <Icon onPress={() => setShowModal(true)} name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: '#194454', marginTop: 5, fontSize: 15 }}>{user.email}</Text>
+                                <Icon name="edit" size={15} style={styles.editIcon} />
+                            </View>
+
+                            <Text style={{ color: '#194454', marginTop: 15 }}>
+                                Date inscription: {dateFormat(user.insert_date)}
+                            </Text>
                         </View>
-
-                        <Text style={{ color: '#194454', marginTop: 15 }}>
-                            Date inscription: 12/12/2012
-                        </Text>
                     </View>
-                </View>
 
-                <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
-                    <Button
-                        onPress={() => navigation.navigate('Wishlist')}
-                        style={styles.toWishlist}
-                        size="lg"
-                        leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
-                        _text={{ fontSize: 20 }}
-                    >
-                        Mes Favorites
-                    </Button>
-                </View>
+                    <View style={{ display: 'flex', alignItems: 'center', marginTop: 60, marginBottom: 30 }}>
+                        <Button
+                            onPress={() => navigation.navigate('Wishlist')}
+                            style={styles.toWishlist}
+                            size="lg"
+                            leftIcon={<Ionicons name="heart-outline" size={35} color="#fff" />}
+                            _text={{ fontSize: 20 }}
+                        >
+                            Mes Favorites
+                        </Button>
+                    </View>
 
-                <View style={styles.headerNotes}>
-                    <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
-                </View>
+                    <View style={styles.headerNotes}>
+                        <Text style={styles.historiqueNotes}>Mon historique de notes</Text>
+                    </View>
 
                 <ScrollView>
                     {Notes}

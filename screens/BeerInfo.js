@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import MapView, { Marker } from 'react-native-maps';
-import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, useToast } from "native-base"
+import { Button, Modal, FormControl, Input, Center, NativeBaseProvider, Avatar, useToast } from "native-base"
 import IPADRESS from '../AdressIP'
 
 
@@ -22,9 +22,9 @@ export default function BeerInfo({ navigation }) {
     const [showModal, setShowModal] = useState(false)
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');
-    const [like, setLike] = useState(false)
+    const [like, setLike] = useState(false);
+    const [imageKey, setimageKey] = useState(1);
     const toast = useToast()
-
 
 
     useEffect(() => {
@@ -36,6 +36,8 @@ export default function BeerInfo({ navigation }) {
         getSellers();
 
         wishlist.forEach(e => { if (e._id === beerInfo._id) setLike(true) })
+
+        setimageKey(prev => prev +1)
 
     }, [beerInfo])
 
@@ -77,10 +79,16 @@ export default function BeerInfo({ navigation }) {
         return s()
     }
 
+    //format date
+    let dateFormat = (el) => {
+        let date = new Date(el);
+        return date.toLocaleDateString('fr-FR');
+    }
+
     let BeerNotes = [];
 
     if (beerInfo.notes.length === 0) BeerNotes.push(
-        <View style={{ padding: 20 }}>
+        <View style={{ borderTopWidth: 1, padding: 20 }}>
             <Text style={{ width: '80%', color: "lightgrey", fontSize: 18 }}>Cette bière n'a pas encore de note, ajoute en une !</Text>
         </View>
     )
@@ -102,13 +110,17 @@ export default function BeerInfo({ navigation }) {
                 <View style={styles.cardInfo}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ margin: 10, backgroundColor: 'grey', width: 30, height: 30, borderRadius: 50, alignItems: 'center', justifyContent: 'center' }}>
-                            <Icon name="user" size={20} color="#fff" />
+                            <Avatar
+                                size="sm"
+                                source={el.owner.avatar !== 'default' ? { uri: el.owner.avatar } : require('../assets/logo_matth_transparent.png')}
+                                key={imageKey}
+                            />
                         </View>
-                        <Text style={{ width: 100 }}>{el.owner.pseudo}</Text>
+                        <Text style={{ width: 100, color: '#194454' }}>{el.owner.pseudo}</Text>
                     </View>
-                    <Text style={{ fontSize: 11 }}>date</Text>
+                    <Text style={{ color: '#194454', fontSize: 11 }}>{dateFormat(el.date)}</Text>
                 </View>
-                <Text style={{ fontSize: 18, width: 180 }}>{el.comment}</Text>
+                <Text style={{ width: 180, color: '#194454', fontWeight: 'bold', textAlign: 'center' }}>{el.comment}</Text>
             </View>
         </View>
     ))
